@@ -51,10 +51,10 @@ export function AchievementsSection() {
               06 / Verified Recognition
             </p>
             <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-white mt-2">
-              <span className="chrome-text">Achievements</span> &amp; Distinctions
+              <span className="text-[#00D9FF]">Achievements</span> &amp; Distinctions
             </h2>
           </div>
-          <p className="text-sm sm:text-base text-[#94A3B8] max-w-md">
+          <p className="text-sm sm:text-base text-[#D5DDE8] max-w-md">
             Documented academic honors, leadership service, and research milestones across state and national technical forums.
           </p>
         </div>
@@ -75,23 +75,23 @@ export function AchievementsSection() {
 
             const badgeStyle =
               item.accent === 'cyan'
-                ? 'border-[#00D9FF]/50 bg-[#0D1A22] text-[#00D9FF]'
+                ? 'border-[#00D9FF]/55 bg-[#0D1A22] text-[#00D9FF]'
                 : item.accent === 'chrome'
-                ? 'border-white/30 bg-[#131822] chrome-text'
-                : 'border-white/15 bg-[#0C0F15] text-white';
+                ? 'border-[#FCD34D]/55 bg-[#1B160B] text-[#FCD34D]'
+                : 'border-[#7DD3FC]/35 bg-[#0C141F] text-[#E0F2FE]';
 
             return (
               <article
                 key={item.id}
                 className="ach-row group border-b border-white/15 py-8 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center hover:bg-[#10131A]/80 transition-colors px-2 sm:px-4"
               >
-                <div className="lg:col-span-2 font-mono-tech text-xs uppercase tracking-widest text-[#94A3B8]">
+                <div className="lg:col-span-2 font-mono-tech text-xs uppercase tracking-widest text-[#7D8CA3]">
                   Index / {item.index}
                 </div>
 
                 <div className="lg:col-span-3">
                   <span
-                    className={`inline-block font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight px-4 py-2 border ${badgeStyle}`}
+                    className={`inline-block font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight px-4 py-2 border tabular-nums ${badgeStyle}`}
                   >
                     {animatedMetric}
                   </span>
@@ -101,12 +101,12 @@ export function AchievementsSection() {
                   <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#00D9FF] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="font-mono-tech text-xs uppercase tracking-wider text-[#00D9FF] mt-1">
+                  <p className="font-mono-tech text-xs uppercase tracking-wider text-[#7DD3FC] mt-1">
                     {item.subtitle}
                   </p>
                 </div>
 
-                <div className="lg:col-span-3 text-sm text-[#94A3B8] leading-relaxed">
+                <div className="lg:col-span-3 text-sm text-[#D5DDE8] leading-relaxed">
                   {item.detail}
                 </div>
               </article>

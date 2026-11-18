@@ -8,11 +8,14 @@ import { AchievementsSection } from './components/AchievementsSection';
 import { ChromeScene3D } from './components/ChromeScene3D';
 import { ContactSection } from './components/ContactSection';
 import { CustomCursor } from './components/CustomCursor';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ExperienceSection } from './components/ExperienceSection';
 import { HeroSection } from './components/HeroSection';
 import { Navbar, SectionId } from './components/Navbar';
 import { ProjectsSection } from './components/ProjectsSection';
+import { SectionRail } from './components/SectionRail';
 import { SkillsSection } from './components/SkillsSection';
+import { FirebaseProvider } from './context/FirebaseContext';
 import { ProjectItem } from './data/portfolioData';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -31,7 +34,7 @@ const SECTION_IDS: SectionId[] = [
   'contact',
 ];
 
-export function App() {
+function PortfolioShell() {
   const rootRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const scrollProgressRef = useRef(0);
@@ -351,7 +354,11 @@ export function App() {
     >
       <CustomCursor />
 
-      <ChromeScene3D scrollProgressRef={scrollProgressRef} />
+      <ChromeScene3D
+        scrollProgressRef={scrollProgressRef}
+        lightingPreset="cyan"
+        cameraMode="scroll"
+      />
 
       <Navbar
         activeSection={activeSection}
@@ -364,20 +371,33 @@ export function App() {
         <AboutSection />
         <ProjectsSection onSelectProject={setSelectedProject} />
         <ExperienceSection />
-        <SkillsSection />
+        <SkillsSection onSelectProject={setSelectedProject} />
         <AchievementsSection />
         <ContactSection onNavigate={handleNavigate} />
       </main>
+
+      <SectionRail activeSection={activeSection} onNavigate={handleNavigate} />
 
       <Suspense fallback={null}>
         {selectedProject && (
           <ProjectModal
             project={selectedProject}
+            onSelectProject={setSelectedProject}
             onClose={() => setSelectedProject(null)}
           />
         )}
       </Suspense>
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <ErrorBoundary>
+      <FirebaseProvider>
+        <PortfolioShell />
+      </FirebaseProvider>
+    </ErrorBoundary>
   );
 }
 

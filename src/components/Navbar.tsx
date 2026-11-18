@@ -1,5 +1,5 @@
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PROFILE } from '../data/portfolioData';
 import { MagneticButton } from './MagneticButton';
 
@@ -29,13 +29,22 @@ const NAV_ITEMS: { id: SectionId; label: string }[] = [
 export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
   const handleLinkClick = (id: SectionId) => {
     setMobileOpen(false);
     onNavigate(id);
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#080A0E]/92">
+    <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#080A0E]/95">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-8">
         <a
           href="#home"
@@ -60,14 +69,14 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
                   e.preventDefault();
                   handleLinkClick(item.id);
                 }}
-                className={`relative py-1.5 text-sm font-medium tracking-tight whitespace-nowrap shrink-0 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
+                className={`relative py-1.5 text-sm font-medium tracking-tight whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
                   isActive ? 'text-[#00D9FF]' : 'text-[#94A3B8] hover:text-white'
                 }`}
               >
                 {item.label}
                 <span
                   aria-hidden="true"
-                  className={`absolute left-0 right-0 -bottom-0.5 h-[1.5px] bg-[#00D9FF] transition-transform duration-300 origin-left ${
+                  className={`absolute left-0 right-0 -bottom-0.5 h-[1.5px] bg-[#00D9FF] transition-transform duration-200 origin-left ${
                     isActive ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'
                   }`}
                 />
@@ -82,7 +91,7 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
               type="button"
               onClick={() => handleLinkClick('contact')}
               data-cursor="CONTACT"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-[#10131A] hover:bg-[#00D9FF] text-white hover:text-[#080A0E] border border-white/15 hover:border-[#00D9FF] text-xs font-mono-tech uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-[#10131A] hover:bg-[#00D9FF] text-white hover:text-[#080A0E] border border-white/15 hover:border-[#00D9FF] text-xs font-mono-tech uppercase tracking-wider transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
             >
               <span>Contact</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -94,7 +103,7 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
             onClick={() => setMobileOpen((prev) => !prev)}
             aria-expanded={mobileOpen}
             aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="md:hidden h-10 w-10 border border-white/15 bg-[#10131A] flex items-center justify-center text-white hover:border-[#00D9FF] transition-colors focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
+            className="md:hidden h-11 w-11 border border-white/15 bg-[#10131A] flex items-center justify-center text-white hover:border-[#00D9FF] transition-colors focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -111,7 +120,7 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-white/10 bg-[#080A0E] px-5 py-4 space-y-1">
+        <div className="md:hidden border-t border-white/10 bg-[#080A0E] px-5 py-3 space-y-1">
           {[...NAV_ITEMS, { id: 'contact' as SectionId, label: 'Contact' }].map((item) => {
             const isActive = activeSection === item.id;
             return (
@@ -122,12 +131,16 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
                   e.preventDefault();
                   handleLinkClick(item.id);
                 }}
-                className={`flex items-center justify-between px-3 py-3 text-sm font-medium border-b border-white/5 last:border-b-0 ${
-                  isActive ? 'text-[#00D9FF] bg-[#10131A]' : 'text-[#F1F5F9]'
+                className={`flex items-center justify-between px-3 min-h-[44px] text-sm font-medium border-b border-white/5 last:border-b-0 transition-colors ${
+                  isActive ? 'text-[#00D9FF] bg-[#10131A]' : 'text-[#F1F5F9] hover:text-[#00D9FF]'
                 }`}
               >
                 <span>{item.label}</span>
-                {isActive && <span className="h-1.5 w-1.5 rounded-full bg-[#00D9FF]" />}
+                {isActive && (
+                  <span className="font-mono-tech text-[10px] uppercase tracking-wider text-[#00D9FF]">
+                    Active
+                  </span>
+                )}
               </a>
             );
           })}

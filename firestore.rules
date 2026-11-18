@@ -1,0 +1,242 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Hardened Global Helpers
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(userId) {
+      return isVerified() && request.auth.uid == userId;
+    }
+
+    function isPortfolioAdmin() {
+      return isVerified() && request.auth.token.email == 'jayakrishnajaishree2007@gmail.com';
+    }
+
+    // 3. Entity Validation Blueprints
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll([
+          'uid',
+          'displayName',
+          'email',
+          'preferredLighting',
+          'preferredCameraMode',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid',
+          'displayName',
+          'email',
+          'preferredLighting',
+          'preferredCameraMode',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.uid is string
+        && data.uid == userId
+        && data.uid == request.auth.uid
+        && data.uid.size() >= 1 && data.uid.size() <= 128
+        && data.displayName is string
+        && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && data.email is string
+        && data.email.size() >= 3 && data.email.size() <= 160
+        && data.preferredLighting in ['cyan', 'tungsten', 'chrome']
+        && data.preferredCameraMode in ['scroll', 'orbit', 'hero']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidProjectBookmark(data, userId, projectId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'projectId',
+          'projectTitle',
+          'note',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId',
+          'projectId',
+          'projectTitle',
+          'note',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.ownerId is string
+        && data.ownerId == userId
+        && data.ownerId == request.auth.uid
+        && data.ownerId.size() >= 1 && data.ownerId.size() <= 128
+        && data.projectId is string
+        && data.projectId == projectId
+        && data.projectId in [
+          'alumni-management-system',
+          'student-module',
+          'aether-routine',
+          'predictive-te-sr'
+        ]
+        && data.projectTitle is string
+        && data.projectTitle.size() >= 1 && data.projectTitle.size() <= 160
+        && data.note is string
+        && data.note.size() <= 500
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidPortfolioInquiry(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'senderName',
+          'senderEmail',
+          'topic',
+          'message',
+          'deliveryMethod',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId',
+          'senderName',
+          'senderEmail',
+          'topic',
+          'message',
+          'deliveryMethod',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.ownerId is string
+        && data.ownerId.size() >= 1 && data.ownerId.size() <= 128
+        && data.senderName is string
+        && data.senderName.size() >= 1 && data.senderName.size() <= 100
+        && data.senderEmail is string
+        && data.senderEmail.size() >= 3 && data.senderEmail.size() <= 160
+        && data.topic is string
+        && data.topic.size() <= 160
+        && data.message is string
+        && data.message.size() >= 1 && data.message.size() <= 2000
+        && data.deliveryMethod in ['firestore', 'gmail-and-firestore']
+        && data.status in ['submitted', 'reviewed']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // 4. Collection Rules
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isPortfolioAdmin());
+      allow list: if false;
+
+      allow create: if isVerified()
+        && isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isVerified()
+        && isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'displayName',
+          'email',
+          'preferredLighting',
+          'preferredCameraMode',
+          'updatedAt'
+        ]);
+
+      allow delete: if false;
+
+      match /bookmarks/{projectId} {
+        allow get: if isValidId(userId) && isValidId(projectId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId) && existing().ownerId == request.auth.uid;
+
+        allow create: if isVerified()
+          && isValidId(userId)
+          && isValidId(projectId)
+          && isOwner(userId)
+          && isValidProjectBookmark(incoming(), userId, projectId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && exists(/databases/$(database)/documents/users/$(userId));
+
+        allow update: if isVerified()
+          && isValidId(userId)
+          && isValidId(projectId)
+          && isOwner(userId)
+          && isValidProjectBookmark(incoming(), userId, projectId)
+          && incoming().ownerId == existing().ownerId
+          && incoming().projectId == existing().projectId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'note',
+            'projectTitle',
+            'updatedAt'
+          ])
+          && exists(/databases/$(database)/documents/users/$(userId));
+
+        allow delete: if isValidId(userId) && isValidId(projectId) && isOwner(userId);
+      }
+    }
+
+    match /inquiries/{inquiryId} {
+      allow get: if isValidId(inquiryId)
+        && isVerified()
+        && (existing().ownerId == request.auth.uid || isPortfolioAdmin());
+
+      allow list: if isVerified()
+        && (existing().ownerId == request.auth.uid || isPortfolioAdmin());
+
+      allow create: if isVerified()
+        && isValidId(inquiryId)
+        && isValidPortfolioInquiry(incoming())
+        && incoming().ownerId == request.auth.uid
+        && incoming().status == 'submitted'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isVerified()
+        && isValidId(inquiryId)
+        && isValidPortfolioInquiry(incoming())
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && isPortfolioAdmin()
+        && existing().status != 'reviewed'
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt']);
+
+      allow delete: if isValidId(inquiryId)
+        && isVerified()
+        && (existing().ownerId == request.auth.uid || isPortfolioAdmin());
+    }
+  }
+}

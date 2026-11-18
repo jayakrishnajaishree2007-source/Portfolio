@@ -1,13 +1,37 @@
-import { Environment, Float, Lightformer } from '@react-three/drei';
+import { Float } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { CameraMode, LightingPreset } from '../context/FirebaseContext';
+import {
+  createBeveledBladeGeometry,
+  createBeveledHexCoreGeometry,
+  createBrushedMetalTexture,
+  createConduitCurve,
+  createContactShadowTexture,
+  createOrbitalArcGeometry,
+  createSteppedPedestalGeometry,
+} from '../three/proceduralCraft';
 import { detectSoftwareWebGL } from '../utils/webgl';
 import { WebGLErrorBoundary } from './WebGLErrorBoundary';
 
 interface ChromeScene3DProps {
   scrollProgressRef: React.MutableRefObject<number>;
+  lightingPreset?: LightingPreset;
+  cameraMode?: CameraMode;
 }
+
+// Module-scope scratch math helpers (Zero GC allocations in useFrame)
+const _lookAtTarget = new THREE.Vector3();
+const _packetPos = new THREE.Vector3();
+const _rimColorTarget = new THREE.Color();
+
+const RIM_COLORS: Record<LightingPreset, string> = {
+  cyan: '#00D9FF',
+  tungsten: '#F59E0B',
+  chrome: '#E2E8F0',
+};
 
 function generateJKTargets(count: number): Float32Array {
   const targets = new Float32Array(count * 3);
@@ -38,39 +62,96 @@ function generateJKTargets(count: number): Float32Array {
 function ObsidianChromeRig({
   scrollProgressRef,
   isMobile,
-}: ChromeScene3DProps & { isMobile: boolean }) {
-  const { camera } = useThree();
+  isSoftwareGl,
+  lightingPresetRef,
+  cameraModeRef,
+}: {
+  scrollProgressRef: React.MutableRefObject<number>;
+  isMobile: boolean;
+  isSoftwareGl: boolean;
+  lightingPresetRef: React.MutableRefObject<LightingPreset>;
+  cameraModeRef: React.MutableRefObject<CameraMode>;
+}) {
+  const { camera, gl, scene } = useThree();
   const pointerRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const introZoomRef = useRef(0);
   const lastFovRef = useRef(46);
 
-  // Act 1: Liquid Chrome Hero Sculpture
-  const heroChromeRef = useRef<THREE.Group>(null);
+  // Light refs for smooth color-temperature transitions without remounting
+  const rimLightRef = useRef<THREE.DirectionalLight>(null);
+  const heroGroupRef = useRef<THREE.Group>(null);
+  const heroSculptureRef = useRef<THREE.Group>(null);
   const liquidTimeRef = useRef({ value: 0 });
 
-  // Act 2: About Floating Metallic Blades
   const aboutGroupRef = useRef<THREE.Group>(null);
-
-  // Act 3: 4 Distinct Project Environments
   const projAlumniRef = useRef<THREE.Group>(null);
   const projStudentRef = useRef<THREE.Group>(null);
   const projRoutineRef = useRef<THREE.Group>(null);
   const projTrafficTeRef = useRef<THREE.Group>(null);
   const srPacketRefs = useRef<(THREE.Mesh | null)[]>([]);
-
-  // Act 4: Experience Connected Metallic Truss
   const expGroupRef = useRef<THREE.Group>(null);
-
-  // Act 5: Skills Metallic Universe
   const skillsInstRef = useRef<THREE.InstancedMesh>(null);
-
-  // Act 6: Achievements Chrome Steles
   const achGroupRef = useRef<THREE.Group>(null);
-
-  // Act 7: Converging Chrome Particles -> JK.
   const particleGeoRef = useRef<THREE.BufferGeometry>(null);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  // Mandatory Studio Environment Reflection via RoomEnvironment + PMREMGenerator
+  useEffect(() => {
+    const pmremGenerator = new THREE.PMREMGenerator(gl);
+    const roomEnv = new RoomEnvironment();
+    const renderTarget = pmremGenerator.fromScene(roomEnv, 0.04);
+    scene.environment = renderTarget.texture;
+    roomEnv.dispose();
+    pmremGenerator.dispose();
+
+    return () => {
+      scene.environment = null;
+      renderTarget.dispose();
+    };
+  }, [gl, scene]);
+
+  // Procedural CanvasTextures & Custom Extrude/Lathe/Tube Geometries
+  const {
+    brushedBumpMap,
+    contactShadowMap,
+    pedestalGeo,
+    hexCoreGeo,
+    bladeGeo,
+    routineBarGeo,
+    orbitalArcGeo,
+  } = useMemo(() => {
+    const maxAniso = gl.capabilities.getMaxAnisotropy();
+    return {
+      brushedBumpMap: createBrushedMetalTexture(maxAniso),
+      contactShadowMap: createContactShadowTexture(),
+      pedestalGeo: createSteppedPedestalGeometry(),
+      hexCoreGeo: createBeveledHexCoreGeometry(0.75, 0.92, 0.09),
+      bladeGeo: createBeveledBladeGeometry(1.75, 2.35, 0.14),
+      routineBarGeo: createBeveledBladeGeometry(0.46, 1.48, 0.24),
+      orbitalArcGeo: createOrbitalArcGeometry(2.15, 0.1, Math.PI * 1.45, 0.045),
+    };
+  }, [gl]);
+
+  useEffect(() => {
+    return () => {
+      brushedBumpMap.dispose();
+      contactShadowMap.dispose();
+      pedestalGeo.dispose();
+      hexCoreGeo.dispose();
+      bladeGeo.dispose();
+      routineBarGeo.dispose();
+      orbitalArcGeo.dispose();
+    };
+  }, [
+    brushedBumpMap,
+    contactShadowMap,
+    pedestalGeo,
+    hexCoreGeo,
+    bladeGeo,
+    routineBarGeo,
+    orbitalArcGeo,
+  ]);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
@@ -81,7 +162,7 @@ function ObsidianChromeRig({
     return () => window.removeEventListener('pointermove', onMove);
   }, []);
 
-  // Liquid Chrome PBR Material with subtle organic vertex ripple via onBeforeCompile
+  // Liquid Chrome PBR Material with vertex ripple via onBeforeCompile & brushed micro-bump
   const liquidChromeMat = useMemo(() => {
     const mat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color('#e2e8f0'),
@@ -89,7 +170,10 @@ function ObsidianChromeRig({
       roughness: 0.06,
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
-      envMapIntensity: 1.7,
+      anisotropy: 0.75,
+      bumpMap: brushedBumpMap,
+      bumpScale: 0.008,
+      envMapIntensity: 1.55,
     });
     const uTime = liquidTimeRef.current;
     mat.onBeforeCompile = (shader) => {
@@ -99,20 +183,26 @@ function ObsidianChromeRig({
         '#include <begin_vertex>',
         `
           #include <begin_vertex>
-          float ripple = sin(position.x * 2.2 + uTime * 1.4) * cos(position.y * 2.0 - uTime * 1.1) * 0.08;
+          float ripple = sin(position.x * 2.2 + uTime * 1.4) * cos(position.y * 2.0 - uTime * 1.1) * 0.075;
           transformed += normal * ripple;
         `
       );
     };
     return mat;
-  }, []);
+  }, [brushedBumpMap]);
 
-  // Volumetric Cyan Overhead Spotlight Cone
+  useEffect(() => {
+    return () => {
+      liquidChromeMat.dispose();
+    };
+  }, [liquidChromeMat]);
+
+  // Volumetric Overhead Spotlight Cone
   const volumetricShader = useMemo(
     () => ({
       uniforms: {
         uColor: { value: new THREE.Color('#00D9FF') },
-        uOpacity: { value: 0.1 },
+        uOpacity: { value: 0.09 },
       },
       vertexShader: `
         varying vec2 vUv;
@@ -135,7 +225,7 @@ function ObsidianChromeRig({
     []
   );
 
-  // Act 3D: Segment Routing Multi-Router Topology Nodes & Moving Packet Paths
+  // Act 3D: Segment Routing Multi-Router Topology Nodes & Curved TubeGeometry Conduits
   const teNodes = useMemo<[number, number, number][]>(
     () => [
       [-2.1, 0.0, 0.5],
@@ -161,20 +251,42 @@ function ObsidianChromeRig({
     []
   );
 
-  const tePathCurves = useMemo(() => {
-    const a = teNodes[0];
-    const b = teNodes[3];
-    const c = teNodes[4];
-    const d = teNodes[5];
-    return [
-      [new THREE.Vector3(...a), new THREE.Vector3(...b)],
-      [new THREE.Vector3(...b), new THREE.Vector3(...c)],
-      [new THREE.Vector3(...c), new THREE.Vector3(...d)],
-    ];
-  }, [teNodes]);
+  const { srConduit, backupConduits } = useMemo(() => {
+    const primary = createConduitCurve([
+      teNodes[0],
+      [-1.4, -0.65, 0.55],
+      teNodes[3],
+      [0.05, -1.15, 0.15],
+      teNodes[4],
+      [1.55, -0.55, -0.05],
+      teNodes[5],
+    ]);
+
+    const backups = teLinks
+      .filter(
+        ([a, b]) => !((a === 0 && b === 3) || (a === 3 && b === 4) || (a === 4 && b === 5))
+      )
+      .map(([a, b]) => {
+        const mid: [number, number, number] = [
+          (teNodes[a][0] + teNodes[b][0]) * 0.5,
+          (teNodes[a][1] + teNodes[b][1]) * 0.5 + 0.16,
+          (teNodes[a][2] + teNodes[b][2]) * 0.5,
+        ];
+        return createConduitCurve([teNodes[a], mid, teNodes[b]], 0.022);
+      });
+
+    return { srConduit: primary, backupConduits: backups };
+  }, [teNodes, teLinks]);
+
+  useEffect(() => {
+    return () => {
+      srConduit.geometry.dispose();
+      backupConduits.forEach((c) => c.geometry.dispose());
+    };
+  }, [srConduit, backupConduits]);
 
   // Act 5 Skills Polyhedra Matrix
-  const skillCount = isMobile ? 16 : 28;
+  const skillCount = isMobile ? 18 : 30;
   const skillSeeds = useMemo(
     () =>
       Array.from({ length: skillCount }, (_, i) => {
@@ -205,6 +317,7 @@ function ObsidianChromeRig({
     if (skillsInstRef.current.instanceColor) {
       skillsInstRef.current.instanceColor.needsUpdate = true;
     }
+    skillsInstRef.current.computeBoundingSphere();
   }, [skillCount]);
 
   // Act 7: Converging Chrome Particles -> JK.
@@ -240,27 +353,54 @@ function ObsidianChromeRig({
     const delta = Math.min(rawDelta, 0.05);
     const elapsed = state.clock.getElapsedTime();
     const scrollP = scrollProgressRef.current;
+    const preset = lightingPresetRef.current;
+    const camMode = cameraModeRef.current;
 
     liquidTimeRef.current.value = elapsed;
 
-    const p = pointerRef.current;
-    p.x = THREE.MathUtils.damp(p.x, p.tx, 4.5, delta);
-    p.y = THREE.MathUtils.damp(p.y, p.ty, 4.5, delta);
+    // Smoothly transition Rim Light & Volumetric Beam color temperature
+    _rimColorTarget.set(RIM_COLORS[preset]);
+    if (rimLightRef.current) {
+      rimLightRef.current.color.lerp(_rimColorTarget, 1 - Math.exp(-5 * delta));
+    }
+    volumetricShader.uniforms.uColor.value.lerp(_rimColorTarget, 1 - Math.exp(-5 * delta));
 
-    // Dramatic initial camera sweep from close-up to hero composition
+    const p = pointerRef.current;
+    const ptrAlpha = 1 - Math.exp(-4.5 * delta);
+    p.x = THREE.MathUtils.lerp(p.x, p.tx, ptrAlpha);
+    p.y = THREE.MathUtils.lerp(p.y, p.ty, ptrAlpha);
+
     introZoomRef.current = THREE.MathUtils.damp(introZoomRef.current, 1, 2.2, delta);
     const introOffsetZ = (1 - introZoomRef.current) * -4.5;
 
-    const targetCamZ = 8 + introOffsetZ - scrollP * 124;
-    const targetCamX = p.x * 0.8 + Math.sin(scrollP * Math.PI * 3.2) * 1.15;
-    const targetCamY = 0.6 + p.y * 0.5 + Math.cos(scrollP * Math.PI * 2.4) * 0.35;
+    const baseCamZ = 8 + introOffsetZ - scrollP * 124;
+    let targetCamX = p.x * 0.8 + Math.sin(scrollP * Math.PI * 3.2) * 1.15;
+    let targetCamY = 0.6 + p.y * 0.5 + Math.cos(scrollP * Math.PI * 2.4) * 0.35;
+    let targetCamZ = baseCamZ;
 
-    camera.position.x = THREE.MathUtils.damp(camera.position.x, targetCamX, 4.5, delta);
-    camera.position.y = THREE.MathUtils.damp(camera.position.y, targetCamY, 4.5, delta);
-    camera.position.z = THREE.MathUtils.damp(camera.position.z, targetCamZ, 5.0, delta);
-    camera.lookAt(Math.sin(scrollP * Math.PI * 2) * 0.35, 0.25, targetCamZ - 14);
+    if (camMode === 'orbit') {
+      targetCamX = Math.sin(elapsed * 0.45) * 3.8 + p.x * 0.6;
+      targetCamY = 0.85 + Math.sin(elapsed * 0.3) * 0.45 + p.y * 0.4;
+      targetCamZ = baseCamZ + Math.cos(elapsed * 0.45) * 1.8 - 1.2;
+    } else if (camMode === 'hero') {
+      targetCamX = p.x * 1.35;
+      targetCamY = 0.45 + p.y * 0.85;
+      targetCamZ = baseCamZ - 1.65;
+    }
 
-    const targetFov = 46 + Math.sin(scrollP * Math.PI * 6) * 1.5;
+    const camAlpha = 1 - Math.exp(-5.0 * delta);
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetCamX, camAlpha);
+    camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetCamY, camAlpha);
+    camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetCamZ, camAlpha);
+
+    _lookAtTarget.set(
+      camMode === 'orbit' ? Math.sin(scrollP * Math.PI * 2) * 0.2 : Math.sin(scrollP * Math.PI * 2) * 0.35,
+      0.22,
+      baseCamZ - 13.5
+    );
+    camera.lookAt(_lookAtTarget);
+
+    const targetFov = (camMode === 'hero' ? 40 : 46) + Math.sin(scrollP * Math.PI * 6) * 1.4;
     const perspCam = camera as THREE.PerspectiveCamera;
     const nextFov = THREE.MathUtils.damp(perspCam.fov, targetFov, 4, delta);
     if (Math.abs(nextFov - lastFovRef.current) > 0.05) {
@@ -269,10 +409,10 @@ function ObsidianChromeRig({
       lastFovRef.current = nextFov;
     }
 
-    // Act 1: Liquid Chrome Sculpture
-    if (heroChromeRef.current) {
-      heroChromeRef.current.rotation.y = elapsed * 0.18 + scrollP * 5.5 + p.x * 0.22;
-      heroChromeRef.current.rotation.x = Math.sin(elapsed * 0.3) * 0.12 + p.y * 0.14;
+    // Act 1: Liquid Chrome Sculpture (pedestal remains grounded, sculpture orbits)
+    if (heroSculptureRef.current) {
+      heroSculptureRef.current.rotation.y = elapsed * 0.18 + scrollP * 5.5 + p.x * 0.24;
+      heroSculptureRef.current.rotation.x = Math.sin(elapsed * 0.3) * 0.1 + p.y * 0.14;
     }
 
     // Act 2: About Floating Metallic Architecture
@@ -281,39 +421,38 @@ function ObsidianChromeRig({
       aboutGroupRef.current.rotation.z = Math.sin(scrollP * Math.PI * 4) * 0.25;
     }
 
-    // Act 3A: Alumni Management System — Floating DB Drums & Connected Profile Plates
+    // Act 3A: Alumni Management System
     if (projAlumniRef.current) {
       projAlumniRef.current.rotation.y = elapsed * 0.18 + scrollP * 2.8 + p.x * 0.2;
       projAlumniRef.current.rotation.x = 0.18 + p.y * 0.14;
     }
 
-    // Act 3B: Student Module — 42-Table Relational Database Lattice
+    // Act 3B: Student Module — 42-Table Relational Hex Core
     if (projStudentRef.current) {
       projStudentRef.current.rotation.y = -elapsed * 0.16 + scrollP * 2.5 + p.x * 0.18;
       projStudentRef.current.rotation.z = Math.sin(elapsed * 0.4) * 0.08;
     }
 
-    // Act 3C: AetherRoutine — Study Timeline Blocks & Gemini AI Spatial Core
+    // Act 3C: AetherRoutine — Study Timeline Towers & AI Core
     if (projRoutineRef.current) {
       projRoutineRef.current.rotation.y = elapsed * 0.2 + scrollP * 2.6 + p.x * 0.18;
       projRoutineRef.current.children.forEach((child, idx) => {
-        if (idx > 0 && idx <= 5) {
-          child.position.y = Math.sin(elapsed * 1.4 + idx * 0.75) * 0.35 + (idx - 3) * 0.36;
+        if (idx >= 2 && idx <= 6) {
+          child.position.y = Math.sin(elapsed * 1.4 + idx * 0.75) * 0.28 + (idx - 4) * 0.24;
         }
       });
     }
 
-    // Act 3D: Predictive Traffic Engineering — Segment Routing Network Topology & Packets
+    // Act 3D: Predictive Traffic Engineering — SR Curved Tube Conduit & Packets
     if (projTrafficTeRef.current) {
-      projTrafficTeRef.current.rotation.y = -0.25 + Math.sin(elapsed * 0.35) * 0.22 + p.x * 0.22;
-      projTrafficTeRef.current.rotation.x = p.y * 0.15;
+      projTrafficTeRef.current.rotation.y = -0.22 + Math.sin(elapsed * 0.35) * 0.22 + p.x * 0.22;
+      projTrafficTeRef.current.rotation.x = p.y * 0.14;
     }
     srPacketRefs.current.forEach((packet, idx) => {
       if (!packet) return;
-      const segIdx = idx % tePathCurves.length;
-      const [start, end] = tePathCurves[segIdx];
-      const t = (elapsed * 0.55 + idx * 0.33) % 1;
-      packet.position.lerpVectors(start, end, t);
+      const t = (elapsed * 0.32 + idx * 0.33) % 1;
+      srConduit.curve.getPointAt(t, _packetPos);
+      packet.position.copy(_packetPos);
     });
 
     // Act 4: Experience Connected Metallic Truss
@@ -346,7 +485,7 @@ function ObsidianChromeRig({
 
     // Act 6: Achievements Chrome Steles
     if (achGroupRef.current) {
-      achGroupRef.current.rotation.y = Math.sin(elapsed * 0.3) * 0.18 + p.x * 0.18;
+      achGroupRef.current.rotation.y = Math.sin(elapsed * 0.3) * 0.16 + p.x * 0.16;
     }
 
     // Act 7: Chrome Particles Converge into JK. Identity at z = -128
@@ -378,18 +517,26 @@ function ObsidianChromeRig({
       <color attach="background" args={['#080A0E']} />
       <fogExp2 attach="fog" args={['#080A0E', 0.024]} />
 
-      {/* High-Contrast Chrome Studio Reflections */}
-      <Environment resolution={64}>
-        <Lightformer form="rect" intensity={3.2} color="#FFFFFF" position={[6, 8, 6]} scale={[12, 4, 1]} />
-        <Lightformer form="rect" intensity={2.6} color="#00D9FF" position={[-7, 3, 4]} scale={[8, 3, 1]} />
-        <Lightformer form="ring" intensity={1.8} color="#94A3B8" position={[0, -5, 2]} scale={8} />
-      </Environment>
+      {/* Balanced Warm/Cool Studio Rig (Key Light + Hemisphere Fill + Rim Light) */}
+      <hemisphereLight args={[0xcbd5e1, 0x080a0e, 0.72]} />
+      <directionalLight
+        position={[8, 12, 10]}
+        intensity={2.35}
+        color="#FFF3E0"
+        castShadow={!isSoftwareGl}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-near={1}
+        shadow-camera-far={40}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
+        shadow-bias={-0.0005}
+        shadow-normalBias={0.02}
+      />
+      <directionalLight ref={rimLightRef} position={[-10, 4, 2]} intensity={1.9} color="#00D9FF" />
 
-      <hemisphereLight args={[0xcbd5e1, 0x080a0e, 0.7]} />
-      <directionalLight position={[8, 12, 10]} intensity={2.4} color="#ffffff" />
-      <directionalLight position={[-10, 4, 2]} intensity={1.8} color="#00D9FF" />
-
-      {/* Subtle Overhead Cyan Volumetric Light Beam */}
+      {/* Subtle Overhead Volumetric Light Beam */}
       <mesh position={[1.2, 4.5, -5]} rotation={[0, 0, 0.28]}>
         <coneGeometry args={[4.4, 18, 24, 1, true]} />
         <shaderMaterial
@@ -401,134 +548,215 @@ function ObsidianChromeRig({
         />
       </mesh>
 
-      {/* ACT 1: LIQUID CHROME HERO SCULPTURE (z = -4) */}
-      <group ref={heroChromeRef} position={[0.45, 0.25, -4]}>
-        <Float speed={1.5} floatIntensity={0.28}>
-          <mesh material={liquidChromeMat}>
-            <torusKnotGeometry args={[1.45, 0.36, 160, 28, 2, 3]} />
-          </mesh>
-        </Float>
-        <mesh position={[0, -2.5, 0]}>
-          <cylinderGeometry args={[2.1, 2.35, 0.24, 48]} />
-          <meshStandardMaterial color="#11151d" metalness={0.82} roughness={0.28} />
+      {/* ACT 1: LIQUID CHROME HERO COMPOSITE GROUP (z = -4, Lathe pedestal + Radial Contact Shadow) */}
+      <group ref={heroGroupRef} position={[0.45, -2.5, -4]}>
+        {/* Grounded Lathe Pedestal (y = 0 bottom pivot) */}
+        <mesh geometry={pedestalGeo} receiveShadow={!isSoftwareGl} castShadow={!isSoftwareGl}>
+          <meshStandardMaterial
+            color="#11151d"
+            metalness={0.55}
+            roughness={0.48}
+            bumpMap={brushedBumpMap}
+            bumpScale={0.01}
+          />
         </mesh>
+
+        {/* Radial Soft Contact Shadow */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
+          <planeGeometry args={[6.2, 6.2]} />
+          <meshBasicMaterial
+            map={contactShadowMap}
+            transparent
+            opacity={0.48}
+            depthWrite={false}
+          />
+        </mesh>
+
+        {/* Floating Composite Sculpture: Liquid TorusKnot + Beveled Trim Ring + Orbital Tube Arc */}
+        <group ref={heroSculptureRef} position={[0, 2.75, 0]}>
+          <Float speed={1.5} floatIntensity={0.25}>
+            <mesh material={liquidChromeMat} castShadow={!isSoftwareGl}>
+              <torusKnotGeometry args={[1.4, 0.34, 160, 28, 2, 3]} />
+            </mesh>
+            <mesh geometry={orbitalArcGeo}>
+              <meshStandardMaterial
+                color="#00D9FF"
+                emissive="#00D9FF"
+                emissiveIntensity={0.45}
+                metalness={0.78}
+                roughness={0.18}
+              />
+            </mesh>
+            <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -1.55, 0]}>
+              <torusGeometry args={[1.62, 0.055, 16, 64]} />
+              <meshStandardMaterial color="#94a3b8" metalness={0.92} roughness={0.14} />
+            </mesh>
+          </Float>
+        </group>
       </group>
 
-      {/* ACT 2: ABOUT FLOATING METALLIC ELEMENTS (z = -18) */}
+      {/* ACT 2: ABOUT COMPOSITE FLOATING METALLIC ELEMENTS (z = -18) */}
       <group ref={aboutGroupRef} position={[-2.5, 0.3, -18]}>
         <mesh position={[-1.2, 0.8, 0]}>
           <torusGeometry args={[1.5, 0.09, 20, 72]} />
-          <meshStandardMaterial color="#e2e8f0" metalness={0.96} roughness={0.08} />
+          <meshPhysicalMaterial
+            color="#e2e8f0"
+            metalness={0.96}
+            roughness={0.08}
+            clearcoat={0.9}
+            bumpMap={brushedBumpMap}
+            bumpScale={0.008}
+          />
         </mesh>
-        <mesh position={[1.5, -0.4, 0.8]} rotation={[0.4, 0.6, 0]}>
-          <boxGeometry args={[1.8, 2.4, 0.14]} />
-          <meshStandardMaterial color="#11151d" metalness={0.85} roughness={0.22} />
+        <mesh geometry={bladeGeo} position={[1.5, -0.4, 0.8]} rotation={[0.4, 0.6, 0]}>
+          <meshStandardMaterial color="#11151d" metalness={0.65} roughness={0.42} />
         </mesh>
         <mesh position={[0.3, 1.4, -0.5]}>
           <sphereGeometry args={[0.52, 28, 28]} />
           <meshStandardMaterial color="#00D9FF" metalness={0.75} roughness={0.14} />
         </mesh>
+        <mesh geometry={orbitalArcGeo} scale={0.72} rotation={[0.6, 0.4, 0]}>
+          <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.18} />
+        </mesh>
       </group>
 
-      {/* ACT 3A: PROJECT 01 — ALUMNI MANAGEMENT SYSTEM (Floating DB Drums & Profile Plates, z = -28) */}
+      {/* ACT 3A: PROJECT 01 — ALUMNI MANAGEMENT SYSTEM (DB Drums + Tube Conduit + Beveled Plates, z = -28) */}
       <group ref={projAlumniRef} position={[3.0, 0.1, -28]}>
         {[-0.85, 0, 0.85].map((y, idx) => (
-          <mesh key={idx} position={[0, y, 0]}>
-            <cylinderGeometry args={[1.2, 1.2, 0.34, 36]} />
-            <meshStandardMaterial
-              color={idx === 1 ? '#00D9FF' : '#cbd5e1'}
-              metalness={0.94}
-              roughness={0.12}
-            />
-          </mesh>
+          <group key={idx} position={[0, y, 0]}>
+            <mesh>
+              <cylinderGeometry args={[1.2, 1.2, 0.3, 36]} />
+              <meshStandardMaterial
+                color={idx === 1 ? '#00D9FF' : '#cbd5e1'}
+                metalness={idx === 1 ? 0.82 : 0.95}
+                roughness={idx === 1 ? 0.16 : 0.1}
+                bumpMap={brushedBumpMap}
+                bumpScale={0.006}
+              />
+            </mesh>
+            <mesh position={[0, 0.17, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[1.18, 0.03, 12, 48]} />
+              <meshStandardMaterial color="#181e29" metalness={0.55} roughness={0.44} />
+            </mesh>
+          </group>
         ))}
-        <mesh position={[-1.7, 0.4, 0.9]} rotation={[0.2, 0.5, 0]}>
-          <boxGeometry args={[1.1, 1.5, 0.08]} />
-          <meshStandardMaterial color="#141822" metalness={0.85} roughness={0.22} />
+        <mesh geometry={bladeGeo} scale={[0.64, 0.64, 0.64]} position={[-1.7, 0.4, 0.9]} rotation={[0.2, 0.5, 0]}>
+          <meshStandardMaterial color="#141822" metalness={0.62} roughness={0.42} />
         </mesh>
-        <mesh position={[1.7, -0.35, -0.7]} rotation={[-0.2, -0.4, 0]}>
-          <boxGeometry args={[1.1, 1.5, 0.08]} />
+        <mesh geometry={bladeGeo} scale={[0.64, 0.64, 0.64]} position={[1.7, -0.35, -0.7]} rotation={[-0.2, -0.4, 0]}>
           <meshStandardMaterial color="#e2e8f0" metalness={0.96} roughness={0.08} />
         </mesh>
       </group>
 
-      {/* ACT 3B: PROJECT 02 — STUDENT MODULE (Interconnected Relational Database Cluster, z = -39) */}
+      {/* ACT 3B: PROJECT 02 — STUDENT MODULE (Beveled Hex Core + Relational Halo + Satellite Nodes, z = -39) */}
       <group ref={projStudentRef} position={[-3.0, 0.2, -39]}>
         <mesh>
-          <torusGeometry args={[1.65, 0.08, 16, 64]} />
+          <torusGeometry args={[1.72, 0.075, 16, 64]} />
           <meshStandardMaterial color="#00D9FF" metalness={0.82} roughness={0.14} />
         </mesh>
-        <mesh>
-          <boxGeometry args={[1.1, 1.1, 1.1]} />
-          <meshStandardMaterial color="#cbd5e1" metalness={0.95} roughness={0.1} />
+        <mesh geometry={hexCoreGeo}>
+          <meshPhysicalMaterial
+            color="#cbd5e1"
+            metalness={0.96}
+            roughness={0.09}
+            clearcoat={0.8}
+            bumpMap={brushedBumpMap}
+            bumpScale={0.008}
+          />
         </mesh>
         {[0, 1, 2, 3, 4, 5].map((i) => {
           const angle = (i / 6) * Math.PI * 2;
           return (
-            <mesh key={i} position={[Math.cos(angle) * 2.0, Math.sin(angle) * 2.0, (i % 2) * 0.45]}>
-              <boxGeometry args={[0.62, 0.48, 0.38]} />
+            <group key={i} position={[Math.cos(angle) * 2.05, Math.sin(angle) * 2.05, (i % 2) * 0.45]}>
+              <mesh>
+                <boxGeometry args={[0.62, 0.48, 0.36]} />
+                <meshStandardMaterial
+                  color={i % 2 === 0 ? '#181e29' : '#94a3b8'}
+                  metalness={i % 2 === 0 ? 0.55 : 0.92}
+                  roughness={i % 2 === 0 ? 0.45 : 0.14}
+                />
+              </mesh>
+              <mesh position={[0, 0, 0.2]}>
+                <boxGeometry args={[0.42, 0.08, 0.04]} />
+                <meshStandardMaterial color="#00D9FF" emissive="#00D9FF" emissiveIntensity={0.6} />
+              </mesh>
+            </group>
+          );
+        })}
+      </group>
+
+      {/* ACT 3C: PROJECT 03 — AETHERROUTINE (Octahedral AI Core + Beveled Timeline Towers, z = -50) */}
+      <group ref={projRoutineRef} position={[2.9, 0.1, -50]}>
+        <mesh position={[0, 1.55, 0]}>
+          <octahedronGeometry args={[0.72, 0]} />
+          <meshPhysicalMaterial color="#00D9FF" metalness={0.78} roughness={0.1} clearcoat={1.0} />
+        </mesh>
+        <mesh position={[0, 1.55, 0]} rotation={[0.5, 0.3, 0]}>
+          <torusGeometry args={[1.05, 0.035, 14, 48]} />
+          <meshStandardMaterial color="#e2e8f0" metalness={0.94} roughness={0.12} />
+        </mesh>
+        {[-1.5, -0.75, 0, 0.75, 1.5].map((x, idx) => (
+          <mesh
+            key={idx}
+            geometry={routineBarGeo}
+            position={[x, (idx - 2) * 0.26, (idx % 2) * 0.48]}
+          >
+            <meshStandardMaterial
+              color={idx === 2 ? '#00D9FF' : idx % 2 === 0 ? '#e2e8f0' : '#181d27'}
+              metalness={idx % 2 === 0 ? 0.94 : 0.55}
+              roughness={idx % 2 === 0 ? 0.12 : 0.46}
+            />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ACT 3D: PROJECT 04 — PREDICTIVE TRAFFIC ENGINEERING (Composite FRR Routers + TubeGeometry Conduits, z = -61) */}
+      <group ref={projTrafficTeRef} position={[-2.4, 0.2, -61]}>
+        {teNodes.map((pos, idx) => (
+          <group key={idx} position={pos}>
+            {/* Matte Graphite Router Chassis */}
+            <mesh>
+              <cylinderGeometry args={[0.38, 0.42, 0.22, 24]} />
+              <meshStandardMaterial color="#181e29" metalness={0.58} roughness={0.46} />
+            </mesh>
+            {/* Polished Chrome Top Plate */}
+            <mesh position={[0, 0.13, 0]}>
+              <cylinderGeometry args={[0.32, 0.34, 0.05, 24]} />
+              <meshStandardMaterial color="#cbd5e1" metalness={0.96} roughness={0.08} />
+            </mesh>
+            {/* Cyan SR Collar */}
+            <mesh position={[0, 0.02, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.41, 0.025, 10, 32]} />
               <meshStandardMaterial
-                color={i % 2 === 0 ? '#181e29' : '#94a3b8'}
-                metalness={0.88}
+                color={idx === 0 || idx === 3 || idx === 4 || idx === 5 ? '#00D9FF' : '#64748b'}
+                emissive={idx === 0 || idx === 5 ? '#00D9FF' : '#000000'}
+                emissiveIntensity={0.55}
+                metalness={0.8}
                 roughness={0.18}
               />
             </mesh>
-          );
-        })}
-      </group>
+          </group>
+        ))}
 
-      {/* ACT 3C: PROJECT 03 — AETHERROUTINE (Study Timeline Bars & AI Gemini Core, z = -50) */}
-      <group ref={projRoutineRef} position={[2.9, 0.1, -50]}>
-        <mesh position={[0, 1.45, 0]}>
-          <octahedronGeometry args={[0.72, 0]} />
-          <meshStandardMaterial color="#00D9FF" metalness={0.78} roughness={0.12} />
+        {/* Primary Segment Routing Curved TubeGeometry Path */}
+        <mesh geometry={srConduit.geometry}>
+          <meshStandardMaterial
+            color="#00D9FF"
+            emissive="#00D9FF"
+            emissiveIntensity={0.6}
+            metalness={0.85}
+            roughness={0.16}
+          />
         </mesh>
-        {[-1.5, -0.75, 0, 0.75, 1.5].map((x, idx) => (
-          <mesh key={idx} position={[x, (idx - 2) * 0.3, (idx % 2) * 0.5]}>
-            <boxGeometry args={[0.45, 1.5, 0.26]} />
-            <meshStandardMaterial
-              color={idx === 2 ? '#00D9FF' : idx % 2 === 0 ? '#e2e8f0' : '#181d27'}
-              metalness={0.92}
-              roughness={0.14}
-            />
-          </mesh>
-        ))}
-      </group>
 
-      {/* ACT 3D: PROJECT 04 — PREDICTIVE TRAFFIC ENGINEERING (3D Multi-Router SR Topology & Packets, z = -61) */}
-      <group ref={projTrafficTeRef} position={[-2.4, 0.2, -61]}>
-        {teNodes.map((pos, idx) => (
-          <mesh key={idx} position={pos}>
-            <cylinderGeometry args={[0.36, 0.36, 0.26, 24]} />
-            <meshStandardMaterial
-              color={idx === 1 || idx === 2 ? '#181e29' : '#cbd5e1'}
-              metalness={0.94}
-              roughness={0.12}
-            />
+        {/* Backup / Secondary Topology Conduits */}
+        {backupConduits.map((conduit, idx) => (
+          <mesh key={idx} geometry={conduit.geometry}>
+            <meshStandardMaterial color="#475569" metalness={0.65} roughness={0.42} />
           </mesh>
         ))}
-        {teLinks.map(([aIdx, bIdx], idx) => {
-          const a = new THREE.Vector3(...teNodes[aIdx]);
-          const b = new THREE.Vector3(...teNodes[bIdx]);
-          const mid = a.clone().add(b).multiplyScalar(0.5);
-          const dist = a.distanceTo(b);
-          const dir = b.clone().sub(a).normalize();
-          const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-          const isSrPath =
-            (aIdx === 0 && bIdx === 3) || (aIdx === 3 && bIdx === 4) || (aIdx === 4 && bIdx === 5);
-          return (
-            <mesh key={idx} position={mid} quaternion={quat}>
-              <cylinderGeometry args={[isSrPath ? 0.045 : 0.025, isSrPath ? 0.045 : 0.025, dist, 8]} />
-              <meshStandardMaterial
-                color={isSrPath ? '#00D9FF' : '#475569'}
-                emissive={isSrPath ? '#00D9FF' : '#000000'}
-                emissiveIntensity={isSrPath ? 0.65 : 0}
-                metalness={0.85}
-                roughness={0.2}
-              />
-            </mesh>
-          );
-        })}
+
+        {/* Animated Segment Routing Packets */}
         {[0, 1, 2].map((pIdx) => (
           <mesh
             key={pIdx}
@@ -553,8 +781,8 @@ function ObsidianChromeRig({
               <boxGeometry args={[3.5, 0.14, 0.35]} />
               <meshStandardMaterial
                 color={idx % 2 === 0 ? '#cbd5e1' : '#181c26'}
-                metalness={0.92}
-                roughness={0.16}
+                metalness={idx % 2 === 0 ? 0.94 : 0.56}
+                roughness={idx % 2 === 0 ? 0.14 : 0.44}
               />
             </mesh>
             <mesh position={[1.75, 0, 0]}>
@@ -579,7 +807,13 @@ function ObsidianChromeRig({
       <group ref={achGroupRef} position={[-2.6, -0.5, -108]}>
         <mesh position={[-1.4, 0.4, 0]}>
           <boxGeometry args={[0.95, 2.9, 0.95]} />
-          <meshStandardMaterial color="#cbd5e1" metalness={0.96} roughness={0.08} />
+          <meshStandardMaterial
+            color="#cbd5e1"
+            metalness={0.96}
+            roughness={0.08}
+            bumpMap={brushedBumpMap}
+            bumpScale={0.008}
+          />
         </mesh>
         <mesh position={[0.1, -0.1, 0.5]}>
           <boxGeometry args={[0.95, 2.0, 0.95]} />
@@ -587,7 +821,7 @@ function ObsidianChromeRig({
         </mesh>
         <mesh position={[1.6, 0.8, -0.3]}>
           <boxGeometry args={[0.95, 3.6, 0.95]} />
-          <meshStandardMaterial color="#141822" metalness={0.86} roughness={0.22} />
+          <meshStandardMaterial color="#141822" metalness={0.58} roughness={0.44} />
         </mesh>
       </group>
 
@@ -609,7 +843,11 @@ function ObsidianChromeRig({
   );
 }
 
-export function ChromeScene3D({ scrollProgressRef }: ChromeScene3DProps) {
+export function ChromeScene3D({
+  scrollProgressRef,
+  lightingPreset = 'cyan',
+  cameraMode = 'scroll',
+}: ChromeScene3DProps) {
   const [isSoftwareGl] = useState(() => detectSoftwareWebGL());
   const [isMobile] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth < 768 : false
@@ -620,12 +858,23 @@ export function ChromeScene3D({ scrollProgressRef }: ChromeScene3DProps) {
       : false
   );
 
+  // Store lightingPreset and cameraMode in refs so UI changes never remount Canvas
+  const lightingPresetRef = useRef<LightingPreset>(lightingPreset);
+  const cameraModeRef = useRef<CameraMode>(cameraMode);
+  useEffect(() => {
+    lightingPresetRef.current = lightingPreset;
+  }, [lightingPreset]);
+  useEffect(() => {
+    cameraModeRef.current = cameraMode;
+  }, [cameraMode]);
+
   return (
     <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none">
       <WebGLErrorBoundary
         fallback={<div aria-hidden="true" className="w-full h-full bg-[#080A0E]" />}
       >
         <Canvas
+          shadows={!isSoftwareGl}
           dpr={isSoftwareGl ? 1 : [1, isMobile ? 1.25 : 1.5]}
           camera={{ fov: 46, near: 0.1, far: 165, position: [0, 0.6, 8] }}
           gl={{
@@ -633,13 +882,25 @@ export function ChromeScene3D({ scrollProgressRef }: ChromeScene3DProps) {
             powerPreference: 'high-performance',
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.08,
+            outputColorSpace: THREE.SRGBColorSpace,
           }}
           frameloop={reducedMotion ? 'demand' : 'always'}
-          onCreated={({ gl }) => {
+          onCreated={({ gl, scene, camera }) => {
+            gl.shadowMap.enabled = !isSoftwareGl;
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
             gl.domElement.addEventListener('webglcontextlost', (e) => e.preventDefault());
+            if (!isSoftwareGl) {
+              gl.compile(scene, camera);
+            }
           }}
         >
-          <ObsidianChromeRig scrollProgressRef={scrollProgressRef} isMobile={isMobile} />
+          <ObsidianChromeRig
+            scrollProgressRef={scrollProgressRef}
+            isMobile={isMobile}
+            isSoftwareGl={isSoftwareGl}
+            lightingPresetRef={lightingPresetRef}
+            cameraModeRef={cameraModeRef}
+          />
         </Canvas>
       </WebGLErrorBoundary>
     </div>

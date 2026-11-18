@@ -5,10 +5,12 @@ export function CustomCursor() {
   const ringRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<string | null>(null);
   const hoveringRef = useRef(false);
+  const textInputRef = useRef(false);
   const [enabled, setEnabled] = useState(false);
   const [label, setLabel] = useState<string | null>(null);
   const [isPressed, setIsPressed] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isTextInput, setIsTextInput] = useState(false);
 
   useEffect(() => {
     const finePointer = window.matchMedia('(pointer: fine)').matches;
@@ -28,10 +30,15 @@ export function CustomCursor() {
       mouseX = e.clientX;
       mouseY = e.clientY;
       const target = e.target as HTMLElement | null;
-      const interactive = target?.closest('a, button, input, textarea, [data-cursor]');
+      const inInput = Boolean(target?.closest('input, textarea, select'));
+      const interactive = !inInput && target?.closest('a, button, [data-cursor]');
       const nextHover = Boolean(interactive);
-      const nextLabel = interactive?.getAttribute('data-cursor') || null;
+      const nextLabel = interactive ? interactive.getAttribute('data-cursor') || null : null;
 
+      if (inInput !== textInputRef.current) {
+        textInputRef.current = inInput;
+        setIsTextInput(inInput);
+      }
       if (nextHover !== hoveringRef.current) {
         hoveringRef.current = nextHover;
         setIsHovering(nextHover);
@@ -85,7 +92,9 @@ export function CustomCursor() {
       <div
         ref={ringRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 z-[100] pointer-events-none -translate-x-1/2 -translate-y-1/2 will-change-transform"
+        className={`fixed top-0 left-0 z-[100] pointer-events-none -translate-x-1/2 -translate-y-1/2 will-change-transform transition-opacity duration-150 ${
+          isTextInput ? 'opacity-0' : 'opacity-100'
+        }`}
       >
         <div
           className={`flex items-center justify-center border transition-all duration-150 ease-out ${
@@ -107,7 +116,9 @@ export function CustomCursor() {
       <div
         ref={dotRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 z-[101] pointer-events-none -translate-x-1/2 -translate-y-1/2 will-change-transform"
+        className={`fixed top-0 left-0 z-[101] pointer-events-none -translate-x-1/2 -translate-y-1/2 will-change-transform transition-opacity duration-150 ${
+          isTextInput ? 'opacity-0' : 'opacity-100'
+        }`}
       >
         <div
           className={`w-1.5 h-1.5 rounded-full bg-[#00D9FF] transition-transform duration-150 ${

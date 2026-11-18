@@ -1,7 +1,35 @@
+import { ArrowUpRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { SKILL_CATEGORIES, SKILLS, SkillCategory } from '../data/portfolioData';
+import { PROJECTS, ProjectItem, SKILL_CATEGORIES, SKILLS, SkillCategory } from '../data/portfolioData';
 
-export function SkillsSection() {
+interface SkillsSectionProps {
+  onSelectProject: (project: ProjectItem) => void;
+}
+
+const SKILL_PROJECT_LINKS: Record<string, string[]> = {
+  Python: ['aether-routine', 'predictive-te-sr'],
+  JavaScript: ['alumni-management-system', 'aether-routine'],
+  HTML: ['alumni-management-system'],
+  CSS: ['alumni-management-system', 'aether-routine'],
+  React: ['aether-routine'],
+  Routing: ['predictive-te-sr'],
+  'Network Engineering': ['predictive-te-sr'],
+  'Machine Learning': ['aether-routine', 'predictive-te-sr'],
+  XGBoost: ['predictive-te-sr'],
+  MySQL: ['alumni-management-system', 'student-module', 'aether-routine'],
+  Linux: ['predictive-te-sr'],
+  Docker: ['predictive-te-sr'],
+};
+
+const CATEGORY_TEXT_CLASS: Record<string, string> = {
+  Networking: 'text-[#7DD3FC] hover:text-[#00D9FF]',
+  'AI / ML': 'text-[#FCD34D]/90 hover:text-[#00D9FF]',
+  Languages: 'text-white hover:text-[#00D9FF]',
+  'Web & Systems': 'text-[#D5DDE8] hover:text-[#00D9FF]',
+  Infrastructure: 'text-[#A5B4FC] hover:text-[#00D9FF]',
+};
+
+export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
   const [activeCategory, setActiveCategory] = useState<SkillCategory>('All');
   const [selectedSkill, setSelectedSkill] = useState<string>(SKILLS[0].name);
 
@@ -18,6 +46,11 @@ export function SkillsSection() {
     [filteredSkills, selectedSkill]
   );
 
+  const relatedProjects = useMemo(() => {
+    const ids = SKILL_PROJECT_LINKS[activeItem.name] ?? [];
+    return PROJECTS.filter((p) => ids.includes(p.id));
+  }, [activeItem.name]);
+
   return (
     <section
       id="skills"
@@ -27,14 +60,13 @@ export function SkillsSection() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14">
           <div>
             <p className="font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
-              05 / Metallic Geometric Stack
+              05 · Metallic Geometric Stack
             </p>
             <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] text-white mt-2">
-              <span className="chrome-text">Technical</span> Capabilities
+              <span className="text-[#00D9FF]">Technical</span> Capabilities
             </h2>
           </div>
 
-          {/* Interactive Category Filter */}
           <div
             role="tablist"
             aria-label="Filter technical skills by category"
@@ -50,7 +82,7 @@ export function SkillsSection() {
                   aria-selected={isSelected}
                   onClick={() => setActiveCategory(category)}
                   data-cursor="FILTER"
-                  className={`px-3.5 py-2 border font-mono-tech text-xs uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
+                  className={`px-3.5 py-2 border font-mono-tech text-xs uppercase tracking-wider transition-colors duration-150 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
                     isSelected
                       ? 'border-[#00D9FF] bg-[#00D9FF] text-[#080A0E] font-semibold'
                       : 'border-white/15 bg-[#10131A] text-[#CBD5E1] hover:border-[#00D9FF] hover:text-white'
@@ -64,11 +96,10 @@ export function SkillsSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          {/* Left: Interactive Chrome Typographic + Metallic Geometric Field */}
-          <div className="lg:col-span-8 skills-scrub-wall flex flex-wrap items-baseline gap-x-6 gap-y-4">
-            {filteredSkills.map((skill, idx) => {
+          {/* Left: Interactive Chrome Typographic Field */}
+          <div className="lg:col-span-8 skills-scrub-wall flex flex-wrap items-baseline gap-x-7 gap-y-4">
+            {filteredSkills.map((skill) => {
               const isActive = activeItem.name === skill.name;
-              const shapeType = idx % 3;
 
               return (
                 <button
@@ -78,25 +109,15 @@ export function SkillsSection() {
                   onFocus={() => setSelectedSkill(skill.name)}
                   onClick={() => setSelectedSkill(skill.name)}
                   data-cursor="INSPECT"
-                  className={`group inline-flex items-center gap-3 text-left transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
+                  className={`group inline-flex items-baseline gap-2 text-left transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
                     isActive ? 'translate-x-1' : ''
                   }`}
                 >
                   <span
-                    aria-hidden="true"
-                    className={`inline-block shrink-0 border transition-transform duration-300 group-hover:rotate-45 ${
-                      shapeType === 0
-                        ? 'w-3.5 h-3.5 border-[#00D9FF] bg-[#00D9FF]/20'
-                        : shapeType === 1
-                        ? 'w-3.5 h-3.5 rounded-full border-[#CBD5E1] bg-white/10'
-                        : 'w-3.5 h-3.5 rotate-45 border-white/40 bg-[#181D27]'
-                    } ${isActive ? 'scale-125 border-[#00D9FF]' : ''}`}
-                  />
-                  <span
                     className={`font-display text-2xl sm:text-4xl lg:text-[2.6rem] font-extrabold tracking-tight leading-none transition-colors ${
                       isActive
                         ? 'text-[#00D9FF] underline decoration-[#00D9FF] decoration-2 underline-offset-8'
-                        : 'chrome-text opacity-80 hover:opacity-100'
+                        : CATEGORY_TEXT_CLASS[skill.category] ?? 'text-[#D5DDE8] hover:text-[#00D9FF]'
                     }`}
                   >
                     {skill.name}
@@ -112,18 +133,17 @@ export function SkillsSection() {
               <span className="font-mono-tech text-xs uppercase tracking-widest text-[#00D9FF]">
                 Active Node
               </span>
-              <span className="font-mono-tech text-xs text-[#94A3B8]">
+              <span className="font-mono-tech text-xs text-[#7D8CA3] tabular-nums">
                 {filteredSkills.length} in view
               </span>
             </div>
 
-            {/* Dynamic Metallic Geometry Stage */}
             <div
               aria-hidden="true"
-              className="h-36 border border-white/10 bg-[#080A0E] obsidian-grid-bg relative overflow-hidden flex items-center justify-center"
+              className="h-32 border border-white/10 bg-[#080A0E] obsidian-grid-bg relative overflow-hidden flex items-center justify-center"
             >
               <div
-                className={`w-20 h-20 border transition-all duration-500 ${
+                className={`w-16 h-16 border transition-all duration-300 ${
                   activeItem.accent === 'cyan'
                     ? 'border-[#00D9FF] bg-[#00D9FF]/15 rotate-12'
                     : activeItem.accent === 'chrome'
@@ -131,21 +151,42 @@ export function SkillsSection() {
                     : 'border-white/30 bg-[#141923] -rotate-12'
                 }`}
               />
-              <div className="absolute bottom-3 left-3 w-4 h-4 border border-[#00D9FF]/60 bg-[#080A0E]" />
-              <div className="absolute top-3 right-3 w-4 h-4 rounded-full border border-white/40 bg-[#10131A]" />
             </div>
 
             <div>
-              <p className="font-mono-tech text-xs uppercase tracking-widest text-[#94A3B8]">
+              <p className="font-mono-tech text-xs uppercase tracking-widest text-[#7DD3FC]">
                 {activeItem.category}
               </p>
               <h3 className="font-display text-3xl font-extrabold text-white mt-1">
                 {activeItem.name}
               </h3>
-              <p className="text-sm sm:text-base text-[#94A3B8] mt-2 leading-relaxed">
-                Applied across: <strong className="text-[#E2E8F0]">{activeItem.context}</strong>
+              <p className="text-sm sm:text-base text-[#7D8CA3] mt-2 leading-relaxed">
+                Applied across: <strong className="text-[#D5DDE8]">{activeItem.context}</strong>
               </p>
             </div>
+
+            {relatedProjects.length > 0 && (
+              <div className="pt-4 border-t border-white/10 space-y-2.5">
+                <p className="font-mono-tech text-[10px] uppercase tracking-[0.2em] text-[#00D9FF]">
+                  Explore in Portfolio Projects
+                </p>
+                <div className="flex flex-col gap-2">
+                  {relatedProjects.map((proj) => (
+                    <button
+                      key={proj.id}
+                      type="button"
+                      onClick={() => onSelectProject(proj)}
+                      className="w-full px-3 py-2 border border-white/15 bg-[#10131A] hover:border-[#00D9FF] text-left flex items-center justify-between gap-2 transition-colors group"
+                    >
+                      <span className="font-mono-tech text-xs text-white group-hover:text-[#00D9FF] truncate">
+                        {proj.number} · {proj.title}
+                      </span>
+                      <ArrowUpRight className="w-3.5 h-3.5 text-[#00D9FF] shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </aside>
         </div>
       </div>

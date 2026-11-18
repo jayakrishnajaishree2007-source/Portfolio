@@ -15,15 +15,15 @@ export function AboutSection() {
         className="border-y border-white/10 bg-[#0C0F15]/90 py-3.5 mb-16 overflow-hidden"
       >
         <div className="about-scrub-marquee flex items-center gap-8 whitespace-nowrap font-display text-lg sm:text-2xl font-bold uppercase tracking-tight will-change-transform">
-          <span className="chrome-text">Computer Networking</span>
+          <span className="text-[#7DD3FC]">Computer Networking</span>
           <span className="text-[#00D9FF]">/</span>
           <span className="text-white">Applied AI &amp; Machine Learning</span>
-          <span className="text-[#94A3B8]">/</span>
-          <span className="chrome-text">Full-Stack Architecture</span>
+          <span className="text-[#FCD34D]">/</span>
+          <span className="text-[#67E8F9]">Full-Stack Architecture</span>
           <span className="text-[#00D9FF]">/</span>
           <span className="text-white">PSG Polytechnic College</span>
-          <span className="text-[#94A3B8]">/</span>
-          <span className="chrome-text">Computer Networking</span>
+          <span className="text-[#FCD34D]">/</span>
+          <span className="text-[#7DD3FC]">Computer Networking</span>
           <span className="text-[#00D9FF]">/</span>
           <span className="text-white">Applied AI &amp; Machine Learning</span>
         </div>
@@ -48,15 +48,15 @@ export function AboutSection() {
                 02 / Spatial Profile
               </p>
               <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] leading-[0.95] text-white">
-                <span className="chrome-text">Building Resilient Networks</span> &amp; Practical Software.
+                Building <span className="text-[#00D9FF]">Resilient Networks</span> &amp; Practical Software.
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-5 border-t border-white/10">
-              <p className="text-sm sm:text-base leading-relaxed text-[#94A3B8]">
+              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
                 {PROFILE.aboutBio1}
               </p>
-              <p className="text-sm sm:text-base leading-relaxed text-[#94A3B8]">
+              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
                 {PROFILE.aboutBio2}
               </p>
             </div>
@@ -64,31 +64,31 @@ export function AboutSection() {
             {/* Key Institutional & Practice Pillars */}
             <div className="grid grid-cols-1 sm:grid-cols-3 border border-white/15 divide-y sm:divide-y-0 sm:divide-x divide-white/15 bg-[#0C0F15]/90">
               <div className="p-5">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#00D9FF]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
                   Institution
                 </p>
                 <p className="font-display font-bold text-base text-white mt-2">
                   {PROFILE.education.institution}
                 </p>
-                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
+                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
                   {PROFILE.education.period}
                 </p>
               </div>
 
               <div className="p-5">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#00D9FF]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
                   Leadership
                 </p>
-                <p className="font-display font-bold text-base text-white mt-2">
+                <p className="font-display font-bold text-base text-[#FCD34D] mt-2">
                   CNA Secretary
                 </p>
-                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
+                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
                   {PROFILE.currentRole.period} Term
                 </p>
               </div>
 
               <div className="p-5 bg-[#10131A]">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#94A3B8]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
                   Official Web Studio
                 </p>
                 <a
@@ -101,7 +101,7 @@ export function AboutSection() {
                   <span>{PROFILE.servicesDomain}</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </a>
-                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
+                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
                   Official Website Building
                 </p>
               </div>
