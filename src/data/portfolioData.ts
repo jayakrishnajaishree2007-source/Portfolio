@@ -107,9 +107,9 @@ export const ACHIEVEMENTS: AchievementItem[] = [
     index: '01',
     metric: '9.92',
     title: 'Department Academic Standing',
-    subtitle: '9.92 CGPA as of 4th Semester · First Rank',
+    subtitle: '9.92 CGPA as of 4th Semester · 2nd Rank',
     detail:
-      'Holding a 9.92 cumulative CGPA as of 4th Semester with 1st Rank distinction in Diploma in Computer Networking at PSG Polytechnic College, including a perfect 10.00 CGPA in 3rd Semester.',
+      'Holding a 9.92 cumulative CGPA as of 4th Semester with 2nd Rank distinction in Diploma in Computer Networking at PSG Polytechnic College, alongside a 1st Rank with perfect 10.00 CGPA in the 3rd Semester.',
     accent: 'cyan',
   },
   {

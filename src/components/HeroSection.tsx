@@ -168,7 +168,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
               Academic Rank
             </p>
             <p className="font-display text-lg sm:text-xl font-extrabold text-[#FDE047] mt-1 tabular-nums group-hover:text-white transition-colors">
-              9.92 CGPA · 1st Rank
+              9.92 CGPA · 2nd Rank
             </p>
             <p className="font-mono-tech text-[11px] text-[#CBD5E1] mt-0.5">
               As of 4th Semester · DCN

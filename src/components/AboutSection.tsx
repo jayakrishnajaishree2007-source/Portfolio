@@ -47,32 +47,35 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left: Clean Editorial Narrative & Pillars */}
           <div className="lg:col-span-7 space-y-8 about-scrub-copy">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>02 · Spatial Profile</span>
+            {/* Narrative Editorial Card with Frosted Glass Blur Backdrop */}
+            <div className="p-6 sm:p-8 border border-white/15 bg-[#0C0F15]/90 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.45)] space-y-6">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>02 · Spatial Profile</span>
+                </div>
+
+                <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] leading-[0.96] text-white">
+                  Engineering <span className="gradient-text-cyan">Resilient Networks</span> &amp;{' '}
+                  <span className="gradient-text-emerald">Practical Software</span>.
+                </h2>
               </div>
 
-              <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] leading-[0.96] text-white">
-                Engineering <span className="gradient-text-cyan">Resilient Networks</span> &amp;{' '}
-                <span className="gradient-text-emerald">Practical Software</span>.
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-5 border-t border-white/10 text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
-              <p>
-                I am a Diploma student in{' '}
-                <span className="text-[#38BDF8] font-semibold">Computer Networking</span> at PSG
-                Polytechnic College. I enjoy architecting dependable systems and exploring how machine
-                learning makes networking infrastructure{' '}
-                <span className="text-[#34D399] font-medium">smarter, observable, and resilient</span>.
-              </p>
-              <p>
-                From <span className="text-[#38BDF8] font-medium">Segment Routing</span> topologies
-                to applied <span className="text-[#C084FC] font-medium">traffic engineering</span> and
-                full-stack web development, I focus on turning complex technical challenges into{' '}
-                <span className="text-[#FCD34D] font-medium">structured, scalable engineering</span>.
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-5 border-t border-white/10 text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+                <p>
+                  I am a Diploma student in{' '}
+                  <span className="text-[#38BDF8] font-semibold">Computer Networking</span> at PSG
+                  Polytechnic College. I enjoy architecting dependable systems and exploring how machine
+                  learning makes networking infrastructure{' '}
+                  <span className="text-[#34D399] font-medium">smarter, observable, and resilient</span>.
+                </p>
+                <p>
+                  From <span className="text-[#38BDF8] font-medium">Segment Routing</span> topologies
+                  to applied <span className="text-[#C084FC] font-medium">traffic engineering</span> and
+                  full-stack web development, I focus on turning complex technical challenges into{' '}
+                  <span className="text-[#FCD34D] font-medium">structured, scalable engineering</span>.
+                </p>
+              </div>
             </div>
 
             {/* Clean 3-Column Institutional Pillars */}
@@ -86,7 +89,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
                   PSG Polytechnic
                 </p>
                 <p className="font-mono-tech text-xs text-[#34D399]">
-                  9.92 CGPA · 4th Sem (1st Rank)
+                  9.92 CGPA · 4th Sem (2nd Rank)
                 </p>
               </div>
 
@@ -215,7 +218,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
                 </div>
                 <div className="flex items-center justify-between text-[#94A3B8]">
                   <span>Academic Standing:</span>
-                  <span className="text-[#FDE047] font-semibold">9.92 CGPA (as of 4th Sem · 1st Rank)</span>
+                  <span className="text-[#FDE047] font-semibold">9.92 CGPA (as of 4th Sem · 2nd Rank)</span>
                 </div>
                 <div className="flex items-center justify-between text-[#94A3B8]">
                   <span>Current Role:</span>
