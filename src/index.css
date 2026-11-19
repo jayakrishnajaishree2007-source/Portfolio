@@ -251,3 +251,20 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out both;
 }
+
+@keyframes portraitScan {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
