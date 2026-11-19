@@ -78,7 +78,10 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
     try {
       await login();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Google sign-in was cancelled or failed.';
+      let msg = err instanceof Error ? err.message : 'Google sign-in was cancelled or failed.';
+      if (msg.includes('auth/unauthorized-domain')) {
+        msg = 'To enable Google Sign-In on Vercel, authorize "jayakrishnaportfolio.vercel.app" in Firebase Console (Authentication > Settings > Authorized Domains).';
+      }
       setStatusMessage({ type: 'error', text: msg });
     }
   };
