@@ -1,6 +1,13 @@
 import { ArrowUpRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { PROJECTS, ProjectItem, SKILL_CATEGORIES, SKILLS, SkillCategory } from '../data/portfolioData';
+import {
+  PROJECTS,
+  ProjectItem,
+  SKILL_CATEGORIES,
+  SKILLS,
+  SkillCategory,
+} from '../data/portfolioData';
+import { TechIcon } from './TechIcon';
 
 interface SkillsSectionProps {
   onSelectProject: (project: ProjectItem) => void;
@@ -22,11 +29,11 @@ const SKILL_PROJECT_LINKS: Record<string, string[]> = {
 };
 
 const CATEGORY_TEXT_CLASS: Record<string, string> = {
-  Programming: 'text-[#38BDF8] hover:text-white',
-  'Web Development': 'text-[#34D399] hover:text-white',
-  Networking: 'text-[#00D9FF] hover:text-white',
-  'AI / Machine Learning': 'text-[#C084FC] hover:text-white',
-  'Databases & Tools': 'text-[#FCD34D] hover:text-white',
+  Programming: 'text-[#38BDF8] group-hover:text-white',
+  'Web Development': 'text-[#34D399] group-hover:text-white',
+  Networking: 'text-[#00D9FF] group-hover:text-white',
+  'AI / Machine Learning': 'text-[#C084FC] group-hover:text-white',
+  'Databases & Tools': 'text-[#FCD34D] group-hover:text-white',
 };
 
 export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
@@ -96,8 +103,8 @@ export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          {/* Left: Interactive Chrome Typographic Field */}
-          <div className="lg:col-span-8 skills-scrub-wall flex flex-wrap items-baseline gap-x-7 gap-y-4">
+          {/* Left: Interactive Chrome Typographic Field with Tech Icons */}
+          <div className="lg:col-span-8 skills-scrub-wall flex flex-wrap items-center gap-3 sm:gap-4">
             {filteredSkills.map((skill) => {
               const isActive = activeItem.name === skill.name;
 
@@ -109,15 +116,20 @@ export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
                   onFocus={() => setSelectedSkill(skill.name)}
                   onClick={() => setSelectedSkill(skill.name)}
                   data-cursor="INSPECT"
-                  className={`group inline-flex items-baseline gap-2 text-left transition-transform duration-150 focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
-                    isActive ? 'translate-x-1' : ''
+                  className={`group inline-flex items-center gap-3 text-left transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[#00D9FF] py-2.5 px-3.5 sm:px-4 border backdrop-blur-md ${
+                    isActive
+                      ? 'border-[#00D9FF] bg-[#10131A] shadow-[0_0_20px_rgba(0,217,255,0.25)] translate-x-1'
+                      : 'border-white/15 bg-[#0C0F15]/90 hover:border-white/30 hover:bg-[#10131A]/90'
                   }`}
                 >
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 shrink-0 flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
+                    <TechIcon name={skill.name} className="w-5 h-5 sm:w-6 sm:h-6 object-contain" />
+                  </span>
                   <span
-                    className={`font-display text-2xl sm:text-4xl lg:text-[2.6rem] font-extrabold tracking-tight leading-none transition-colors ${
+                    className={`font-display text-lg sm:text-2xl font-bold tracking-tight leading-none transition-colors ${
                       isActive
-                        ? 'text-[#00D9FF] underline decoration-[#00D9FF] decoration-2 underline-offset-8'
-                        : CATEGORY_TEXT_CLASS[skill.category] ?? 'text-[#D5DDE8] hover:text-[#00D9FF]'
+                        ? 'text-[#00D9FF]'
+                        : CATEGORY_TEXT_CLASS[skill.category] ?? 'text-[#D5DDE8]'
                     }`}
                   >
                     {skill.name}
@@ -127,8 +139,8 @@ export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
             })}
           </div>
 
-          {/* Right: Graphite Metallic Inspector Panel */}
-          <aside className="lg:col-span-4 border border-white/15 bg-[#0C0F15] p-7 sm:p-8 space-y-6">
+          {/* Right: Graphite Metallic Inspector Panel with Large Tech Logo Stage */}
+          <aside className="lg:col-span-4 border border-white/15 bg-[#0C0F15]/95 backdrop-blur-md p-7 sm:p-8 space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <span className="font-mono-tech text-xs uppercase tracking-widest text-[#00D9FF]">
                 Active Node
@@ -138,19 +150,21 @@ export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
               </span>
             </div>
 
+            {/* Official Tech Stack Logo Display Box */}
             <div
               aria-hidden="true"
-              className="h-32 border border-white/10 bg-[#080A0E] obsidian-grid-bg relative overflow-hidden flex items-center justify-center"
+              className="h-36 border border-white/15 bg-[#080A0E] obsidian-grid-bg relative overflow-hidden flex items-center justify-center p-4 group"
             >
               <div
-                className={`w-16 h-16 border transition-all duration-300 ${
-                  activeItem.accent === 'cyan'
-                    ? 'border-[#00D9FF] bg-[#00D9FF]/15 rotate-12'
-                    : activeItem.accent === 'chrome'
-                    ? 'border-white/70 bg-gradient-to-br from-white/30 to-slate-500/10 rounded-full scale-110'
-                    : 'border-white/30 bg-[#141923] -rotate-12'
-                }`}
+                aria-hidden="true"
+                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,217,255,0.18),transparent_65%)] pointer-events-none"
               />
+              <div className="relative z-10 transition-transform duration-300 transform group-hover:scale-110 drop-shadow-[0_4px_20px_rgba(0,217,255,0.35)] flex flex-col items-center gap-2">
+                <TechIcon name={activeItem.name} className="w-16 h-16 sm:w-20 sm:h-20" />
+                <span className="font-mono-tech text-[10px] text-[#00D9FF] tracking-widest uppercase font-semibold">
+                  {activeItem.name} Architecture
+                </span>
+              </div>
             </div>
 
             <div>
