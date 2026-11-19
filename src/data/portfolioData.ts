@@ -63,7 +63,7 @@ export const PROFILE = {
   brand: 'JAYAKRISHNA®',
   shortMark: 'JK.',
   fullName: 'Jayakrishna J',
-  heroDisplayName: 'JAYAKRISHNA',
+  heroDisplayName: 'JAYAKRISHNA J',
   roleLine: 'Developer · Computer Networking · AI/ML',
   tagline: 'Engineering ideas into real-world systems.',
   footerTagline: 'Engineering Ideas. Building Possibilities.',
