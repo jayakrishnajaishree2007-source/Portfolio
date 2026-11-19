@@ -255,7 +255,7 @@ export function AlbumSection() {
             </button>
 
             {/* Left Image Viewport */}
-            <div className="relative flex-1 bg-black flex items-center justify-center min-h-[340px] max-h-[60vh] lg:max-h-none overflow-hidden select-none">
+            <div className="relative flex-1 bg-black flex items-center justify-center min-h-[220px] sm:min-h-[320px] max-h-[48vh] lg:max-h-none overflow-hidden select-none">
               {imageErrors[activePhoto.id] ? (
                 <div className="w-full h-full min-h-[320px] flex flex-col items-center justify-center p-8 text-center text-[#94A3B8]">
                   <ImageIcon className="w-16 h-16 text-[#00D9FF]/40 mb-3" />
@@ -280,18 +280,18 @@ export function AlbumSection() {
                     type="button"
                     onClick={handlePrev}
                     aria-label="Previous photo"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/70 hover:bg-[#00D9FF] hover:text-[#080A0E] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105"
+                    className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/70 hover:bg-[#00D9FF] hover:text-[#080A0E] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105"
                   >
-                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
 
                   <button
                     type="button"
                     onClick={handleNext}
                     aria-label="Next photo"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/70 hover:bg-[#00D9FF] hover:text-[#080A0E] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105"
+                    className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-black/70 hover:bg-[#00D9FF] hover:text-[#080A0E] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105"
                   >
-                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                    <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
                   </button>
 
                   {/* Photo counter overlay */}

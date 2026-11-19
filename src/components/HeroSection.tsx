@@ -37,7 +37,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Left Oversized Liquid-Chrome Typography */}
           <div className="lg:col-span-7 space-y-6 hero-scrub-title">
-            <h1 className="hero-stagger font-display font-extrabold uppercase leading-[0.94] tracking-[-0.03em] text-[clamp(1.95rem,8.2vw,3.6rem)] lg:text-[clamp(2.9rem,4.6vw,5.1rem)] whitespace-nowrap">
+            <h1 className="hero-stagger font-display font-extrabold uppercase leading-[0.94] tracking-[-0.03em] text-[clamp(1.65rem,7.5vw,3.6rem)] lg:text-[clamp(2.9rem,4.6vw,5.1rem)] sm:whitespace-nowrap">
               <span className="chrome-text">{PROFILE.heroDisplayName}</span>
               <span className="text-[#00D9FF]">.</span>
             </h1>
