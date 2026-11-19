@@ -178,27 +178,20 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
   /* ═══════════════════════════════════════════════
      PHASE 5: Portfolio Stage — Staggered UI Reveal
+     (Waits for user to click "Enter Studio")
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'portfolio') return;
     const t1 = setTimeout(() => setShowPortraitFrame(true), 250);
     const t2 = setTimeout(() => setShowSideTelemetry(true), 500);
     const t3 = setTimeout(() => setShowEnter(true), 750);
-    const tAuto = setTimeout(() => {
-      if (!skippedRef.current) {
-        skippedRef.current = true;
-        setStage('exit');
-        setTimeout(() => onComplete(), 700);
-      }
-    }, 4800);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
-      clearTimeout(tAuto);
     };
-  }, [stage, onComplete]);
+  }, [stage]);
 
   /* ═══════════════════════════════════════════════
      BACKGROUND: Warp-Speed Particle Starfield
