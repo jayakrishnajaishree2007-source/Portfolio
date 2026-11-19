@@ -27,17 +27,20 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
       id="home"
       className="relative min-h-screen pt-24 pb-14 sm:pb-20 flex items-center border-b border-white/10 overflow-hidden"
     >
-      <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-8 lg:px-12 space-y-4 sm:space-y-6 lg:space-y-7">
-        {/* Precision Studio Top Index Bar */}
-        <div className="hero-stagger flex flex-wrap items-center justify-between gap-4 p-3.5 sm:p-4 lg:p-0 lg:pb-3 bg-[#0C0F15]/85 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-none lg:border-b lg:border-white/10 font-mono-tech text-xs tracking-[0.18em] shadow-[0_8px_24px_rgba(0,0,0,0.4)] lg:shadow-none">
-          <span className="text-[#00D9FF] font-semibold uppercase">01 · Studio Index</span>
-          <span className="uppercase text-[#7DD3FC]">{PROFILE.roleLine}</span>
-        </div>
-
+      <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-8 lg:px-12 space-y-8 sm:space-y-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           {/* Left Oversized Liquid-Chrome Typography with Mobile Readability Scrim */}
           <div className="lg:col-span-7 space-y-6 hero-scrub-title p-6 sm:p-8 lg:p-0 bg-[#0C0F15]/85 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-none shadow-[0_16px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
-            <h1 className="hero-stagger font-display font-extrabold uppercase leading-[0.94] tracking-[-0.03em] text-[clamp(1.5rem,6.8vw,3.6rem)] lg:text-[clamp(2.7rem,4.4vw,5.1rem)] sm:whitespace-nowrap">
+            {/* Integrated Studio Index Label directly above the name */}
+            <div className="hero-stagger flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10 font-mono-tech text-xs tracking-[0.18em]">
+              <div className="flex items-center gap-2 font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
+                <span className="w-1.5 h-1.5 bg-[#00D9FF] rounded-full inline-block animate-pulse" />
+                <span className="font-semibold">01 · Studio Index</span>
+              </div>
+              <span className="uppercase text-[#7DD3FC] text-[11px] sm:text-xs tracking-wider">{PROFILE.roleLine}</span>
+            </div>
+
+            <h1 className="hero-stagger font-display font-extrabold uppercase leading-[0.94] tracking-[-0.03em] text-[clamp(1.5rem,6.8vw,3.6rem)] lg:text-[clamp(2.7rem,4.4vw,5.1rem)] sm:whitespace-nowrap pt-1">
               <span className="chrome-text">{PROFILE.heroDisplayName}</span>
               <span className="text-[#00D9FF]">.</span>
             </h1>
