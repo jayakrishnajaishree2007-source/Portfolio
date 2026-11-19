@@ -4,11 +4,13 @@
   --bg-obsidian: #080a0e;
   --bg-graphite: #10131a;
   --text-chrome: #ffffff;
-  --text-prose: #d5dde8;
-  --text-silver: #7d8ca3;
+  --text-prose: #f1f5f9;
+  --text-silver: #94a3b8;
   --accent-cyan: #00d9ff;
-  --accent-sky: #7dd3fc;
+  --accent-sky: #38bdf8;
   --accent-gold: #fcd34d;
+  --accent-emerald: #34d399;
+  --accent-purple: #c084fc;
 }
 
 @layer base {
@@ -27,6 +29,7 @@
   }
 
   @media (pointer: fine) {
+
     body.has-custom-cursor,
     body.has-custom-cursor a,
     body.has-custom-cursor button {
@@ -49,7 +52,36 @@
 }
 
 .chrome-text {
-  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 58%, #93c5fd 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 30%, #38bdf8 68%, #00d9ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 32px rgba(0, 217, 255, 0.32));
+}
+
+.gradient-text-cyan {
+  background: linear-gradient(135deg, #ffffff 10%, #38bdf8 55%, #00d9ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #ffffff 10%, #fde047 55%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #ffffff 10%, #4ade80 55%, #10b981 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-text-purple {
+  background: linear-gradient(135deg, #ffffff 10%, #e879f9 55%, #c084fc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -65,12 +97,15 @@
 ::-webkit-scrollbar {
   width: 5px;
 }
+
 ::-webkit-scrollbar-track {
   background: #080a0e;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #273040;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #00d9ff;
 }

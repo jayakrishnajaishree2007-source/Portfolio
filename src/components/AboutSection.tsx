@@ -15,17 +15,17 @@ export function AboutSection() {
         className="border-y border-white/10 bg-[#0C0F15]/90 py-3.5 mb-16 overflow-hidden"
       >
         <div className="about-scrub-marquee flex items-center gap-8 whitespace-nowrap font-display text-lg sm:text-2xl font-bold uppercase tracking-tight will-change-transform">
-          <span className="text-[#7DD3FC]">Computer Networking</span>
+          <span className="text-[#38BDF8]">Computer Networking</span>
           <span className="text-[#00D9FF]">/</span>
-          <span className="text-white">Applied AI &amp; Machine Learning</span>
+          <span className="text-[#C084FC]">Applied AI &amp; Machine Learning</span>
           <span className="text-[#FCD34D]">/</span>
-          <span className="text-[#67E8F9]">Full-Stack Architecture</span>
+          <span className="text-[#34D399]">Full-Stack Architecture</span>
           <span className="text-[#00D9FF]">/</span>
-          <span className="text-white">PSG Polytechnic College</span>
+          <span className="text-[#FDE047]">PSG Polytechnic College</span>
           <span className="text-[#FCD34D]">/</span>
-          <span className="text-[#7DD3FC]">Computer Networking</span>
+          <span className="text-[#38BDF8]">Computer Networking</span>
           <span className="text-[#00D9FF]">/</span>
-          <span className="text-white">Applied AI &amp; Machine Learning</span>
+          <span className="text-[#C084FC]">Applied AI &amp; Machine Learning</span>
         </div>
       </div>
 
@@ -48,47 +48,50 @@ export function AboutSection() {
                 02 / Spatial Profile
               </p>
               <h2 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.03em] leading-[0.95] text-white">
-                Building <span className="text-[#00D9FF]">Resilient Networks</span> &amp; Practical Software.
+                Building <span className="gradient-text-cyan">Resilient Networks</span> &amp; <span className="gradient-text-emerald">Practical Software</span>.
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-5 border-t border-white/10">
-              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
-                {PROFILE.aboutBio1}
+              <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
+                I am a Diploma student in <span className="text-[#38BDF8] font-medium">Computer Networking</span> at PSG Polytechnic College. I enjoy building practical software systems and exploring how artificial intelligence makes computer networks <span className="text-[#34D399] font-medium">smarter, resilient, and more observable</span>.
               </p>
-              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
-                {PROFILE.aboutBio2}
+              <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
+                Across <span className="text-[#38BDF8] font-medium">networking infrastructure</span>, applied <span className="text-[#C084FC] font-medium">machine learning</span>, and end-to-end web engineering, I focus on turning real institutional and technical constraints into <span className="text-[#FCD34D] font-medium">clean, structured systems</span>.
               </p>
             </div>
 
             {/* Key Institutional & Practice Pillars */}
             <div className="grid grid-cols-1 sm:grid-cols-3 border border-white/15 divide-y sm:divide-y-0 sm:divide-x divide-white/15 bg-[#0C0F15]/90">
               <div className="p-5">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#38BDF8] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#38BDF8] rounded-full inline-block" />
                   Institution
                 </p>
                 <p className="font-display font-bold text-base text-white mt-2">
                   {PROFILE.education.institution}
                 </p>
-                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
+                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
                   {PROFILE.education.period}
                 </p>
               </div>
 
               <div className="p-5">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#FCD34D] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#FCD34D] rounded-full inline-block" />
                   Leadership
                 </p>
-                <p className="font-display font-bold text-base text-[#FCD34D] mt-2">
+                <p className="font-display font-bold text-base text-[#FDE047] mt-2">
                   CNA Secretary
                 </p>
-                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
+                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
                   {PROFILE.currentRole.period} Term
                 </p>
               </div>
 
               <div className="p-5 bg-[#10131A]">
-                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+                <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#C084FC] flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 bg-[#C084FC] rounded-full inline-block" />
                   Official Web Studio
                 </p>
                 <a
@@ -96,13 +99,13 @@ export function AboutSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   data-cursor="VISIT"
-                  className="font-display font-bold text-base text-[#00D9FF] hover:text-white mt-2 inline-flex items-center gap-1 transition-colors"
+                  className="font-display font-bold text-base text-[#C084FC] hover:text-white mt-2 inline-flex items-center gap-1 transition-colors"
                 >
                   <span>{PROFILE.servicesDomain}</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowUpRight className="w-4 h-4 text-[#C084FC]" />
                 </a>
-                <p className="font-mono-tech text-xs text-[#7D8CA3] mt-1">
-                  Official Website Building
+                <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">
+                  Custom Web Engineering
                 </p>
               </div>
             </div>

@@ -587,3 +587,548 @@ export const SKILLS: SkillItem[] = [
     accent: 'graphite',
   },
 ];
+
+export type AlbumCategory =
+  | 'All'
+  | 'Awards & Events'
+  | 'CNA Secretary'
+  | 'Campus Life';
+
+export const ALBUM_CATEGORIES: AlbumCategory[] = [
+  'All',
+  'Awards & Events',
+  'CNA Secretary',
+  'Campus Life',
+];
+
+export interface AlbumPhoto {
+  id: string;
+  title: string;
+  caption: string;
+  category: Exclude<AlbumCategory, 'All'>;
+  date: string;
+  location?: string;
+  imageUrl: string;
+  tag: string;
+  color: string;
+}
+
+export const INITIAL_ALBUM_PHOTOS: AlbumPhoto[] = [
+  {
+    "id": "photo-award-1",
+    "title": "Department First Rank Felicitation",
+    "caption": "Receiving the Department 1st Rank honor on stage at PSG Polytechnic College Auditorium for achieving a perfect 10.00 CGPA in Computer Networking.",
+    "category": "Awards & Events",
+    "date": "Academic Year 2025–26",
+    "location": "PSG Polytechnic College Auditorium",
+    "imageUrl": "/assets/album/awards/award-1st-rank.jpeg",
+    "tag": "Academic Rank 1",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-award-2",
+    "title": "INFINITUM '26 — On Stage Honor",
+    "caption": "Receiving the 2nd Place award on stage in front of the grand LED backdrop at the INFINITUM '26 State Level Technical Symposium.",
+    "category": "Awards & Events",
+    "date": "January 22, 2026",
+    "location": "CIT Sandwich Polytechnic College",
+    "imageUrl": "/assets/album/awards/award-02.jpeg",
+    "tag": "INFINITUM '26",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-award-3",
+    "title": "Symposium Laurels with Principal Dr. B. Giriraj",
+    "caption": "Presenting our INFINITUM '26 State Level Symposium certificates to Principal Dr. B. Giriraj in the Principal's Office.",
+    "category": "Awards & Events",
+    "date": "January 2026",
+    "location": "Principal's Office, PSG Tech",
+    "imageUrl": "/assets/album/awards/award-03.jpeg",
+    "tag": "Principal Commendation",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-award-4",
+    "title": "INTEROFEST-2K26 Certificate of Achievement",
+    "caption": "Official Certificate of Achievement securing 3rd Place in Paper Presentation at the INTEROFEST-2K26 National Level Technical Symposium.",
+    "category": "Awards & Events",
+    "date": "February 28, 2026",
+    "location": "Sree Sakthi Engineering College",
+    "imageUrl": "/assets/album/awards/award-04.jpeg",
+    "tag": "National Symposium",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-award-5",
+    "title": "Symposium Delegation & Co-Presenter Nikitha N",
+    "caption": "Auditorium delegation selfie with co-presenter Nikitha N and DCN teammates holding our paper presentation credentials.",
+    "category": "Awards & Events",
+    "date": "February 2026",
+    "location": "Symposium Auditorium Hall",
+    "imageUrl": "/assets/album/awards/award-05.jpeg",
+    "tag": "Symposium Delegation",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-award-6",
+    "title": "INTEROFEST-2K26 Honors with Principal",
+    "caption": "Commemorating our 3rd place National Level Paper Presentation finish alongside Principal Dr. B. Giriraj in the conference chamber.",
+    "category": "Awards & Events",
+    "date": "March 2026",
+    "location": "Principal's Office, PSG Tech",
+    "imageUrl": "/assets/album/awards/award-06.jpeg",
+    "tag": "Paper Presentation",
+    "color": "#F472B6"
+  },
+  {
+    "id": "photo-award-7",
+    "title": "Symposium Delegation Campus Group",
+    "caption": "Group capture with the student delegation outside the academic complex after competitive technical paper presentations.",
+    "category": "Awards & Events",
+    "date": "2026",
+    "location": "Coimbatore Campus Grounds",
+    "imageUrl": "/assets/album/awards/award-07.jpeg",
+    "tag": "DCN Team",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-award-8",
+    "title": "SanTekFest-2K26 — 1st Prize Presentation",
+    "caption": "Receiving the championship memento and certificate on stage from the Chief Guest at the SanTekFest-2K26 National Level Technical Symposium.",
+    "category": "Awards & Events",
+    "date": "August 20–21, 2026",
+    "location": "Sankara Polytechnic College, Saravanampatty",
+    "imageUrl": "/assets/album/awards/award-08.jpeg",
+    "tag": "1st Prize Winner",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-award-9",
+    "title": "SanTekFest 1st Prize Trophy & \"AI Ethics\" Paper",
+    "caption": "Official 1st Prize memento, cash award envelope, and certificate for presenting research on \"AI Ethics and Bias\" with Nikitha N.",
+    "category": "Awards & Events",
+    "date": "August 21, 2026",
+    "location": "Sankara Polytechnic College, Saravanampatty",
+    "imageUrl": "/assets/album/awards/award-09.jpeg",
+    "tag": "Championship Trophy",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-award-10",
+    "title": "Official Certificate of Merit — 1st Rank",
+    "caption": "Certificate of Merit awarded to Jayakrishna J (Diploma in Computer Networking 2nd Year) for securing First Rank in the Academic Year 2025–2026.",
+    "category": "Awards & Events",
+    "date": "Academic Year 2025–26",
+    "location": "PSG Polytechnic College",
+    "imageUrl": "/assets/album/awards/award-10.jpeg",
+    "tag": "Department Rank 1",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-award-11",
+    "title": "Official Statement of Grades — 10.00 CGPA",
+    "caption": "Official Diploma Examinations Statement of Grades recording a flawless 10.00 CGPA with straight 'O' (Outstanding) grades across all theory & laboratory subjects.",
+    "category": "Awards & Events",
+    "date": "October 2025 Exams",
+    "location": "Autonomous Exam Wing, PSG Tech",
+    "imageUrl": "/assets/album/awards/award-11.jpeg",
+    "tag": "Perfect 10 CGPA",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-award-12",
+    "title": "INFINITUM '26 State Level 2nd Place Certificate",
+    "caption": "Official Certificate of Appreciation won for securing 2nd Place in Paper Presentation at the INFINITUM '26 State Level Technical Symposium.",
+    "category": "Awards & Events",
+    "date": "January 22, 2026",
+    "location": "CIT Sandwich Polytechnic College",
+    "imageUrl": "/assets/album/awards/award-12.jpeg",
+    "tag": "Paper Presentation 2nd",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-sec-1",
+    "title": "Students Union 2026–27 Inaugural Function",
+    "caption": "Official inauguration ceremony on stage with Principal Dr. B. Giriraj, distinguished Chief Guests, and the elected Students Union 2026–27 office bearers.",
+    "category": "CNA Secretary",
+    "date": "Academic Year 2026–27",
+    "location": "Main Auditorium, PSG Tech",
+    "imageUrl": "/assets/album/secretary/secretary-01.jpeg",
+    "tag": "Inaugural Ceremony",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-sec-2",
+    "title": "Inaugural Ceremony — Seated at Dignitary Dais",
+    "caption": "Seated on the main dais at the dignitary table with official desk nameplate \"JAYAKRISHNA J\" alongside HOD Dr. S. Brindha during the Inaugural Function.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Auditorium Dais",
+    "imageUrl": "/assets/album/secretary/secretary-02.jpeg",
+    "tag": "Inaugural Dais",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-sec-3",
+    "title": "Inaugural Ceremony — Dignitaries & Faculty on Stage",
+    "caption": "On stage during the Inaugural Ceremony welcoming distinguished Chief Guests, Principal Dr. B. Giriraj, and academic faculty.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Auditorium Dais",
+    "imageUrl": "/assets/album/secretary/secretary-03.jpeg",
+    "tag": "Inaugural Ceremony",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-sec-4",
+    "title": "Official CNA Office Bearers Poster 2026–27",
+    "caption": "Official publication of the Computer Networking Association (CNA) Office Bearers: Jayakrishna J (DCN Secretary) leading the executive council.",
+    "category": "CNA Secretary",
+    "date": "2026–2027 Term",
+    "location": "PSG Polytechnic College",
+    "imageUrl": "/assets/album/secretary/secretary-04.jpeg",
+    "tag": "DCN Secretary",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-sec-5",
+    "title": "Inaugural Ceremony — DCN Secretary on Stage Dais",
+    "caption": "Seated at the dignitary table on stage behind official desk nameplate \"Mr. JAYAKRISHNA J - SECRETARY\" during the Inaugural Ceremony at PSG Tech.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Auditorium Dais",
+    "imageUrl": "/assets/album/secretary/secretary-05.jpeg",
+    "tag": "Inaugural Dais",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-sec-6",
+    "title": "Inaugural Ceremony — Complete Dais Assembly",
+    "caption": "Full view of the stage dais at the Inaugural Ceremony: Principal Dr. B. Giriraj, Chief Guest, HOD Dr. S. Brindha, Secretary Jayakrishna J, and Joint Secretary.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Auditorium Dais",
+    "imageUrl": "/assets/album/secretary/secretary-06.jpeg",
+    "tag": "Inaugural Dais",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-sec-7",
+    "title": "Inaugural Function — Address with Microphone at Podium",
+    "caption": "Addressing the assembly into the microphone at the podium as DCN Secretary during the official Inaugural Function at PSG Tech.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Auditorium Podium",
+    "imageUrl": "/assets/album/secretary/secretary-07.jpeg",
+    "tag": "Inaugural Address",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-sec-8",
+    "title": "Inaugural Function — Escorting Chief Guests & HOD",
+    "caption": "Leading the dignitary procession escorting Chief Guests and HOD Dr. S. Brindha into the auditorium for the Inaugural Ceremony.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Tech Academic Corridor",
+    "imageUrl": "/assets/album/secretary/secretary-08.jpeg",
+    "tag": "Inaugural Procession",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-sec-9",
+    "title": "DCN Lab — QUIZZ?IT 2026 Scoring & Preparation",
+    "caption": "Preparing quiz questions, score evaluation sheets, and rule sets on the laptop with Gokul and organizing committee.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department of Computer Networking (DCN) Lab",
+    "imageUrl": "/assets/album/secretary/secretary-09.jpeg",
+    "tag": "QUIZZ?IT Prep",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-sec-10",
+    "title": "DCN Lab — Console Setup & Round Verification",
+    "caption": "Finalizing live round timers, buzzer rules, and question database with student coordinators prior to QUIZZ?IT 2026.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department of Computer Networking (DCN) Lab",
+    "imageUrl": "/assets/album/secretary/secretary-10.jpeg",
+    "tag": "Quiz Coordination",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-sec-11",
+    "title": "QUIZZ?IT 2026 — Live Championship Console",
+    "caption": "Managing the live technical quiz competition console for the Computer Networking Association (CNA) QUIZZ?IT 2026 Grand Finale.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "DCN Department Seminar Hall",
+    "imageUrl": "/assets/album/secretary/secretary-11.jpeg",
+    "tag": "QUIZZ?IT 2026",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-sec-12",
+    "title": "QUIZZ?IT 2026 — DCN vs DAM Grand Finale",
+    "caption": "Controlling quiz rounds, screen mirroring, and question timers alongside Gokul and Nikitha during the DCN Champion vs DAM Champion showdown.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "DCN Department Seminar Hall",
+    "imageUrl": "/assets/album/secretary/secretary-12.jpeg",
+    "tag": "Battle of Minds",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-sec-13",
+    "title": "QUIZZ?IT 2026 — Quiz Master at Podium",
+    "caption": "Conducting technical quiz questions from the podium as Quiz Master while options display on the projection screen.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "DCN Department Seminar Hall",
+    "imageUrl": "/assets/album/secretary/secretary-13.jpeg",
+    "tag": "Quiz Master",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-sec-14",
+    "title": "Teachers Day Celebration & Joyful Moments",
+    "caption": "Joyful celebration moments with close classmates and balloon during Teachers Day celebrations in the department.",
+    "category": "CNA Secretary",
+    "date": "September 5, 2026",
+    "location": "PSG Polytechnic College Classroom",
+    "imageUrl": "/assets/album/secretary/secretary-14.jpeg",
+    "tag": "Teachers Day",
+    "color": "#F472B6"
+  },
+  {
+    "id": "photo-sec-15",
+    "title": "TECHNO MEME 2026 in CN Lab",
+    "caption": "Conducting the TECHNO MEME event (Code, Create, Meme, Make Tech Fun!) presented by CNA with students competing on lab workstations.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Computer Networking (CN) Lab",
+    "imageUrl": "/assets/album/secretary/secretary-15.jpeg",
+    "tag": "TECHNO MEME",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-sec-16",
+    "title": "TECHNO MEME Event Coordination & Smartboard",
+    "caption": "Explaining event rules and coordinating evaluation on the interactive smartboard during the TECHNO MEME competition.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Computer Networking (CN) Lab",
+    "imageUrl": "/assets/album/secretary/secretary-16.jpeg",
+    "tag": "Event Lead",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-sec-17",
+    "title": "PolyFest 2026 — Discussion with Senior Faculty",
+    "caption": "Discussing event arrangements and student participation with senior faculty coordinator during the PolyFest celebrations.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department Academic Block",
+    "imageUrl": "/assets/album/secretary/secretary-17.jpeg",
+    "tag": "PolyFest 2026",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-sec-18",
+    "title": "CNA Core Executive Committee & Organizers",
+    "caption": "CNA Core Executive Committee and Student Organizers group photo in the DCN Lab in front of the Department Vision & Mission whiteboard.",
+    "category": "CNA Secretary",
+    "date": "Academic Year 2026–27",
+    "location": "Department of Computer Networking (DCN) Lab",
+    "imageUrl": "/assets/album/secretary/secretary-18.jpeg",
+    "tag": "Executive Committee",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-sec-19",
+    "title": "DCN Secretary Official Portrait",
+    "caption": "Official portrait as Secretary of the Computer Networking Association wearing the college uniform and insignia badge.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "PSG Polytechnic College",
+    "imageUrl": "/assets/album/secretary/secretary-19.jpeg",
+    "tag": "Official Portrait",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-sec-20",
+    "title": "PolyFest 2026 — Faculty Coordination & Event Review",
+    "caption": "Reviewing association activities and competition outcomes with department professors during PolyFest 2026.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department Academic Block",
+    "imageUrl": "/assets/album/secretary/secretary-20.jpeg",
+    "tag": "Faculty Coordination",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-sec-21",
+    "title": "PolyFest 2026 — CNA Organizing Squad",
+    "caption": "Celebrating the successful execution of department competitions with the association organizing team.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department Academic Block",
+    "imageUrl": "/assets/album/secretary/secretary-21.jpeg",
+    "tag": "Organizing Squad",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-sec-22",
+    "title": "PolyFest 2026 — Chalkboard Commemoration",
+    "caption": "Squad photo in front of the green chalkboard celebrating PSG Polytechnic College PolyFest 2026 and ECE/DCN Association Day.",
+    "category": "CNA Secretary",
+    "date": "2026",
+    "location": "Department Classroom",
+    "imageUrl": "/assets/album/secretary/secretary-22.jpeg",
+    "tag": "PolyFest Milestone",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-col-1",
+    "title": "Avinashi Road & PSG Tech Main Gate",
+    "caption": "Evening stroll and moments with close friends near the PSG Tech main entrance and Avinashi Road flyover.",
+    "category": "Campus Life",
+    "date": "2025–2026",
+    "location": "PSG Tech Main Gate & Avinashi Road Flyover",
+    "imageUrl": "/assets/album/college/college-01.jpeg",
+    "tag": "Campus Life",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-col-2",
+    "title": "DCN Squad Outside Academic Complex",
+    "caption": "Selfie with the Computer Networking squad outside the department academic block after theory lectures.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "PSG Polytechnic College Campus",
+    "imageUrl": "/assets/album/college/college-02.jpeg",
+    "tag": "DCN Batchmates",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-col-3",
+    "title": "PDE Lab, I-Block — Study & Record Session",
+    "caption": "Group study, lab circuit calculations, and practical record work with classmates inside the PDE Lab in I-Block.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "PDE Lab, I-Block, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-03.jpeg",
+    "tag": "PDE Lab I-Block",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-col-4",
+    "title": "PDE Lab — Laboratory Workbench",
+    "caption": "Hands-on lab practicals and circuit experimentation sitting at the wooden workbench in the PDE Lab.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "PDE Lab, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-04.jpeg",
+    "tag": "PDE Lab Workbench",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-col-5",
+    "title": "Analog & Digital Electronics Lecture",
+    "caption": "Classroom lecture on ADC & DAC Converters (Sampling, Quantization, Encoding) with the professor and batchmates.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Classroom, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-05.jpeg",
+    "tag": "Electronics Lecture",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-col-6",
+    "title": "DCN Squad at Academic Block Staircase",
+    "caption": "DCN batchmates squad taking a break on the marble staircase inside the department academic block.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Department Academic Block Staircase",
+    "imageUrl": "/assets/album/college/college-06.jpeg",
+    "tag": "Squad Hangout",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-col-7",
+    "title": "Computer Networking & Systems Lab",
+    "caption": "Smiling at the lab workstation surrounded by chart boards on network design, configuration, and connectivity.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Systems Lab, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-07.jpeg",
+    "tag": "DCN Systems Lab",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-col-8",
+    "title": "Microprocessor & Digital Systems Classroom",
+    "caption": "Standing in college uniform in front of the green chalkboard with hex memory codes (15H, 55H, 355H) and 'Stay Positive'.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Classroom, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-08.jpeg",
+    "tag": "Microprocessor Class",
+    "color": "#00D9FF"
+  },
+  {
+    "id": "photo-col-9",
+    "title": "DCN Classroom I-413 — Friends & Study Moments",
+    "caption": "Classroom selfie and learning camaraderie with benchmates in Classroom I-413.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Classroom I-413, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-09.jpeg",
+    "tag": "Classroom I-413",
+    "color": "#C084FC"
+  },
+  {
+    "id": "photo-col-10",
+    "title": "DCN Classroom I-413 — Lecture Interval Selfie",
+    "caption": "Thumbs up and break-time moments with the squad at our desks in Classroom I-413.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Classroom I-413, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-10.jpeg",
+    "tag": "Classroom I-413",
+    "color": "#FCD34D"
+  },
+  {
+    "id": "photo-col-11",
+    "title": "DCN Lab Server Room — Rack & Infrastructure",
+    "caption": "Exploring the server rack cabinet and high-speed networking switchgear in the DCN Lab Server Room.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Lab Server Room, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-11.jpeg",
+    "tag": "Server Room",
+    "color": "#38BDF8"
+  },
+  {
+    "id": "photo-col-12",
+    "title": "DCN Lab Server Room — Console Workstation",
+    "caption": "At the dedicated server monitoring workstation by the server rack in the DCN Lab Server Room.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Lab Server Room, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-12.jpeg",
+    "tag": "Server Console",
+    "color": "#34D399"
+  },
+  {
+    "id": "photo-col-13",
+    "title": "DCN Systems Lab — Hands-on Engineering",
+    "caption": "Focused hands-on engineering, web development, and network simulation on laptops at the lab workbench.",
+    "category": "Campus Life",
+    "date": "2025",
+    "location": "DCN Systems Lab, PSG Polytechnic College",
+    "imageUrl": "/assets/album/college/college-13.jpeg",
+    "tag": "Systems Lab",
+    "color": "#00D9FF"
+  }
+];

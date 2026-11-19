@@ -163,7 +163,7 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
       return;
     }
 
-    if (user && user.emailVerified) {
+    if (user) {
       setSubmitting(true);
       try {
         await submitFirestoreInquiry({
@@ -215,7 +215,7 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start pb-16 border-b border-white/15">
           <div className="lg:col-span-6 space-y-6">
             <div className="font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
-              <span>07 / Final Composition</span>
+              <span>08 / Final Composition</span>
             </div>
 
             <h2 className="font-display text-5xl sm:text-7xl font-extrabold uppercase tracking-[-0.04em] leading-[0.88] text-white">
@@ -225,7 +225,7 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
               </span>
             </h2>
 
-            <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8] max-w-lg">
+            <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9] max-w-lg">
               Looking for custom website development, or collaborating on computer networking and applied AI/ML systems? Visit my official website building studio at{' '}
               <a
                 href={PROFILE.servicesUrl}
@@ -557,6 +557,15 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
                   <div className="flex flex-wrap gap-1.5" role="group" aria-label="Quick topic presets">
                     {TOPIC_PRESETS.map((preset) => {
                       const isActive = subject === preset;
+                      const presetStyle =
+                        preset.includes('Website Studio')
+                          ? 'border-[#FCD34D] bg-[#FCD34D]/15 text-[#FCD34D]'
+                          : preset.includes('Networking')
+                          ? 'border-[#00D9FF] bg-[#00D9FF]/15 text-[#00D9FF]'
+                          : preset.includes('AI')
+                          ? 'border-[#C084FC] bg-[#C084FC]/15 text-[#C084FC]'
+                          : 'border-[#34D399] bg-[#34D399]/15 text-[#34D399]';
+
                       return (
                         <button
                           key={preset}
@@ -565,8 +574,8 @@ export function ContactSection({ onNavigate }: ContactSectionProps) {
                           aria-pressed={isActive}
                           className={`px-2.5 py-1 border font-mono-tech text-[10px] uppercase tracking-wider transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#00D9FF] ${
                             isActive
-                              ? 'border-[#00D9FF] bg-[#00D9FF] text-[#080A0E] font-semibold'
-                              : 'border-white/15 bg-[#10131A] text-[#94A3B8] hover:border-[#00D9FF]/60 hover:text-white'
+                              ? `${presetStyle} font-semibold shadow-[0_0_12px_rgba(0,217,255,0.2)]`
+                              : 'border-white/15 bg-[#10131A] text-[#CBD5E1] hover:border-[#00D9FF]/60 hover:text-white'
                           }`}
                         >
                           {preset}

@@ -5,6 +5,7 @@ import Lenis from 'lenis';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { AboutSection } from './components/AboutSection';
 import { AchievementsSection } from './components/AchievementsSection';
+import { AlbumSection } from './components/AlbumSection';
 import { ChromeScene3D } from './components/ChromeScene3D';
 import { ContactSection } from './components/ContactSection';
 import { CustomCursor } from './components/CustomCursor';
@@ -31,6 +32,7 @@ const SECTION_IDS: SectionId[] = [
   'experience',
   'skills',
   'achievements',
+  'album',
   'contact',
 ];
 
@@ -373,6 +375,7 @@ function PortfolioShell() {
         <ExperienceSection />
         <SkillsSection onSelectProject={setSelectedProject} />
         <AchievementsSection />
+        <AlbumSection />
         <ContactSection onNavigate={handleNavigate} />
       </main>
 

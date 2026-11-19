@@ -159,16 +159,16 @@ export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
           <article className="project-env bg-[#0C0F15]/90 border-y border-white/15 py-12 sm:py-16 px-2 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             <div className="lg:col-span-6 space-y-6">
               <div className="flex flex-wrap items-center gap-2.5 font-mono-tech text-xs uppercase tracking-[0.18em]">
-                <span className="text-[#00D9FF] font-bold">{p1.number}</span>
+                <span className="text-[#38BDF8] font-bold">{p1.number}</span>
                 <span aria-hidden="true" className="text-white/30">/</span>
-                <span className="text-[#7DD3FC]">{p1.category}</span>
+                <span className="text-[#38BDF8] font-medium">{p1.category}</span>
               </div>
 
               <h3 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-[0.95] text-white">
                 {p1.title}
               </h3>
 
-              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+              <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
                 {p1.description}
               </p>
 
@@ -285,16 +285,16 @@ export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
 
             <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
               <div className="flex flex-wrap items-center gap-2.5 font-mono-tech text-xs uppercase tracking-[0.18em]">
-                <span className="text-[#00D9FF] font-bold">{p2.number}</span>
+                <span className="text-[#34D399] font-bold">{p2.number}</span>
                 <span aria-hidden="true" className="text-white/30">/</span>
-                <span className="text-[#7DD3FC]">{p2.category}</span>
+                <span className="text-[#34D399] font-medium">{p2.category}</span>
               </div>
 
               <h3 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold tracking-tight leading-[0.98] text-white">
                 {p2.title}
               </h3>
 
-              <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+              <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
                 {p2.description}
               </p>
 
@@ -374,16 +374,16 @@ export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex flex-wrap items-center gap-2.5 font-mono-tech text-xs uppercase tracking-[0.18em]">
-                  <span className="text-[#00D9FF] font-bold">{p3.number}</span>
+                  <span className="text-[#C084FC] font-bold">{p3.number}</span>
                   <span aria-hidden="true" className="text-white/30">/</span>
-                  <span className="text-[#7DD3FC]">{p3.category}</span>
+                  <span className="text-[#C084FC] font-medium">{p3.category}</span>
                 </div>
 
                 <h3 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-[0.95] text-white">
                   {p3.title}
                 </h3>
 
-                <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8] max-w-2xl">
+                <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9] max-w-2xl">
                   {p3.description}
                 </p>
               </div>
@@ -484,16 +484,16 @@ export function ProjectsSection({ onSelectProject }: ProjectsSectionProps) {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="space-y-4 max-w-3xl">
                 <div className="flex flex-wrap items-center gap-2.5 font-mono-tech text-xs uppercase tracking-[0.18em]">
-                  <span className="text-[#00D9FF] font-bold">{p4.number}</span>
+                  <span className="text-[#FCD34D] font-bold">{p4.number}</span>
                   <span aria-hidden="true" className="text-white/30">/</span>
-                  <span className="text-[#7DD3FC]">{p4.category}</span>
+                  <span className="text-[#FCD34D] font-medium">{p4.category}</span>
                 </div>
 
                 <h3 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight leading-[0.95] text-white">
                   {p4.title}
                 </h3>
 
-                <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+                <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
                   {p4.description}
                 </p>
 

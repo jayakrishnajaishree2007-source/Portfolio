@@ -12,7 +12,8 @@ const CHAPTERS: { id: SectionId; num: string; label: string }[] = [
   { id: 'experience', num: '04', label: 'Timeline' },
   { id: 'skills', num: '05', label: 'Skills' },
   { id: 'achievements', num: '06', label: 'Honors' },
-  { id: 'contact', num: '07', label: 'Contact' },
+  { id: 'album', num: '07', label: 'Album' },
+  { id: 'contact', num: '08', label: 'Contact' },
 ];
 
 export function SectionRail({ activeSection, onNavigate }: SectionRailProps) {

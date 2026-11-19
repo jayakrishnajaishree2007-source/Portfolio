@@ -10,6 +10,7 @@ export type SectionId =
   | 'experience'
   | 'skills'
   | 'achievements'
+  | 'album'
   | 'contact';
 
 interface NavbarProps {
@@ -24,6 +25,7 @@ const NAV_ITEMS: { id: SectionId; label: string }[] = [
   { id: 'experience', label: 'Experience' },
   { id: 'skills', label: 'Skills' },
   { id: 'achievements', label: 'Achievements' },
+  { id: 'album', label: 'Album' },
 ];
 
 export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProps) {
@@ -46,17 +48,25 @@ export function Navbar({ activeSection, progressBarRef, onNavigate }: NavbarProp
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-white/10 bg-[#080A0E]/95">
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-8">
-        <a
-          href="#home"
-          data-cursor="TOP"
-          onClick={(e) => {
-            e.preventDefault();
-            handleLinkClick('home');
-          }}
-          className="font-display text-xl sm:text-2xl font-extrabold tracking-[-0.04em] text-white whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
-        >
-          {PROFILE.brand}
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="#home"
+            data-cursor="TOP"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLinkClick('home');
+            }}
+            className="font-display text-xl sm:text-2xl font-extrabold tracking-[-0.04em] whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
+          >
+            <span className="gradient-text-cyan">JAYAKRISHNA</span>
+            <span className="text-[#00D9FF] text-lg font-bold ml-0.5">®</span>
+          </a>
+
+          <div className="hidden xl:inline-flex items-center gap-2 px-3 py-1 border border-[#34D399]/35 bg-[#34D399]/10 text-[#34D399] font-mono-tech text-[11px] tracking-wider uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
+            <span>Open for Opportunities</span>
+          </div>
+        </div>
 
         <nav aria-label="Primary Navigation" className="hidden md:flex items-center gap-6 lg:gap-8">
           {NAV_ITEMS.map((item) => {

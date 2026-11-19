@@ -1,7 +1,6 @@
-import { Camera, RotateCcw } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
-const PORTRAIT_STORAGE_KEY = 'jk_portfolio_portrait_v1';
+const DEFAULT_PORTRAIT_URL = '/assets/jk-portrait.jpeg';
 
 interface PortraitFrameProps {
   variant?: 'hero' | 'about';
@@ -10,25 +9,8 @@ interface PortraitFrameProps {
 
 export function PortraitFrame({ variant = 'hero', className = '' }: PortraitFrameProps) {
   const frameRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
-  const [customPhoto, setCustomPhoto] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(PORTRAIT_STORAGE_KEY);
-      if (saved) setCustomPhoto(saved);
-    } catch {
-      // Ignore storage errors
-    }
-
-    const onSync = (e: Event) => {
-      const custom = e as CustomEvent<string | null>;
-      setCustomPhoto(custom.detail ?? null);
-    };
-    window.addEventListener('jk-portrait-updated', onSync);
-    return () => window.removeEventListener('jk-portrait-updated', onSync);
-  }, []);
+  const [imageError, setImageError] = useState(false);
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== 'mouse') return;
@@ -42,35 +24,6 @@ export function PortraitFrame({ variant = 'hero', className = '' }: PortraitFram
 
   const handlePointerLeave = () => {
     setTilt({ rx: 0, ry: 0 });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === 'string' ? reader.result : null;
-      if (!result) return;
-      setCustomPhoto(result);
-      try {
-        window.localStorage.setItem(PORTRAIT_STORAGE_KEY, result);
-      } catch {
-        // Ignore quota errors
-      }
-      window.dispatchEvent(new CustomEvent('jk-portrait-updated', { detail: result }));
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
-  const handleReset = () => {
-    setCustomPhoto(null);
-    try {
-      window.localStorage.removeItem(PORTRAIT_STORAGE_KEY);
-    } catch {
-      // Ignore storage errors
-    }
-    window.dispatchEvent(new CustomEvent('jk-portrait-updated', { detail: null }));
   };
 
   const isHero = variant === 'hero';
@@ -112,12 +65,12 @@ export function PortraitFrame({ variant = 'hero', className = '' }: PortraitFram
           }}
         />
 
-        {customPhoto ? (
+        {!imageError ? (
           <img
-            src={customPhoto}
-            alt="Portrait of Jayakrishna J"
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover object-top grayscale contrast-115 group-hover:grayscale-0 transition-all duration-500"
+            src={DEFAULT_PORTRAIT_URL}
+            alt="Portrait of Jayakrishna J — DCN Secretary"
+            onError={() => setImageError(true)}
+            className="w-full h-full object-cover object-top transition-transform duration-500 will-change-transform group-hover:scale-105"
           />
         ) : (
           <div className="relative w-full h-full bg-[#0C0F15] flex items-end justify-center overflow-hidden">
@@ -215,41 +168,13 @@ export function PortraitFrame({ variant = 'hero', className = '' }: PortraitFram
             <p className="font-mono-tech text-[11px] uppercase tracking-[0.18em] text-[#00D9FF]">
               Jayakrishna J
             </p>
-            <p className="font-mono-tech text-[10px] text-[#94A3B8]">
-              PSG Polytechnic · DCN 2025–27
-            </p>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="sr-only"
-              aria-label="Upload portrait photograph"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              data-cursor="PHOTO"
-              className="px-2.5 py-1.5 border border-white/20 bg-[#10131A] hover:border-[#00D9FF] hover:text-[#00D9FF] text-[10px] font-mono-tech uppercase tracking-wider text-white flex items-center gap-1.5 transition-colors focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
-              title="Set personal portrait"
-            >
-              <Camera className="w-3 h-3 text-[#00D9FF]" />
-              <span>{customPhoto ? 'Change' : 'Photo'}</span>
-            </button>
-            {customPhoto && (
-              <button
-                type="button"
-                onClick={handleReset}
-                aria-label="Reset portrait to default"
-                className="p-1.5 border border-white/20 bg-[#10131A] hover:border-[#00D9FF] text-[#94A3B8] hover:text-white transition-colors focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
-                title="Reset portrait"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </button>
-            )}
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#34D399] animate-pulse" />
+            <span className="font-mono-tech text-[10px] text-[#34D399] uppercase tracking-wider font-semibold">
+              Official
+            </span>
           </div>
         </div>
       </div>

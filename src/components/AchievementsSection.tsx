@@ -75,17 +75,17 @@ export function AchievementsSection() {
 
             const badgeStyle =
               item.accent === 'cyan'
-                ? 'border-[#00D9FF]/55 bg-[#0D1A22] text-[#00D9FF]'
+                ? 'border-[#00D9FF]/60 bg-[#00D9FF]/10 text-[#00D9FF] shadow-[0_0_20px_rgba(0,217,255,0.2)]'
                 : item.accent === 'chrome'
-                ? 'border-[#FCD34D]/55 bg-[#1B160B] text-[#FCD34D]'
-                : 'border-[#7DD3FC]/35 bg-[#0C141F] text-[#E0F2FE]';
+                  ? 'border-[#FCD34D]/60 bg-[#FCD34D]/10 text-[#FDE047] shadow-[0_0_20px_rgba(252,211,77,0.2)]'
+                  : 'border-[#34D399]/60 bg-[#34D399]/10 text-[#34D399] shadow-[0_0_20px_rgba(52,211,153,0.2)]';
 
             return (
               <article
                 key={item.id}
                 className="ach-row group border-b border-white/15 py-8 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center hover:bg-[#10131A]/80 transition-colors px-2 sm:px-4"
               >
-                <div className="lg:col-span-2 font-mono-tech text-xs uppercase tracking-widest text-[#7D8CA3]">
+                <div className="lg:col-span-2 font-mono-tech text-xs uppercase tracking-widest text-[#94A3B8]">
                   Index / {item.index}
                 </div>
 
@@ -101,13 +101,13 @@ export function AchievementsSection() {
                   <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#00D9FF] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="font-mono-tech text-xs uppercase tracking-wider text-[#7DD3FC] mt-1">
+                  <p className="font-mono-tech text-xs uppercase tracking-wider text-[#38BDF8] mt-1 font-medium">
                     {item.subtitle}
                   </p>
                 </div>
 
-                <div className="lg:col-span-3 text-sm text-[#D5DDE8] leading-relaxed">
-                  {item.detail}
+                <div className="lg:col-span-3 text-sm text-[#F1F5F9] leading-relaxed">
+                  <p>{item.detail}</p>
                 </div>
               </article>
             );
@@ -117,3 +117,4 @@ export function AchievementsSection() {
     </section>
   );
 }
+

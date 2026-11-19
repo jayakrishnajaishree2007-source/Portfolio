@@ -159,7 +159,7 @@ export function ProjectModal({ project, onSelectProject, onClose }: ProjectModal
             )}
           </div>
 
-          <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+          <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
             {project.description}
           </p>
           {project.scopeNote && (

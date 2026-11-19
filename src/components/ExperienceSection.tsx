@@ -2,6 +2,13 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 import { EXPERIENCE_TIMELINE, PROFILE } from '../data/portfolioData';
 
+const TYPE_STYLES: Record<string, { text: string; bg: string; border: string; dot: string }> = {
+  Education: { text: 'text-[#38BDF8]', bg: 'bg-[#38BDF8]/10', border: 'border-[#38BDF8]/40', dot: 'bg-[#38BDF8]' },
+  Leadership: { text: 'text-[#34D399]', bg: 'bg-[#34D399]/10', border: 'border-[#34D399]/40', dot: 'bg-[#34D399]' },
+  Internship: { text: 'text-[#C084FC]', bg: 'bg-[#C084FC]/10', border: 'border-[#C084FC]/40', dot: 'bg-[#C084FC]' },
+  'Web Studio': { text: 'text-[#FCD34D]', bg: 'bg-[#FCD34D]/10', border: 'border-[#FCD34D]/40', dot: 'bg-[#FCD34D]' },
+};
+
 export function ExperienceSection() {
   const [focusedId, setFocusedId] = useState<string>(EXPERIENCE_TIMELINE[0].id);
 
@@ -52,18 +59,19 @@ export function ExperienceSection() {
         <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-white/10">
           {EXPERIENCE_TIMELINE.map((m) => {
             const active = focusedId === m.id;
+            const style = TYPE_STYLES[m.type] ?? TYPE_STYLES.Education;
             return (
               <button
                 key={m.id}
                 type="button"
                 onClick={() => handleFocusMilestone(m.id)}
-                className={`px-3 py-1.5 border font-mono-tech text-[11px] uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 ${
-                  active
-                    ? 'border-[#00D9FF] bg-[#00D9FF] text-[#080A0E] font-semibold'
-                    : 'border-white/15 bg-[#0C0F15] text-[#CBD5E1] hover:border-[#00D9FF] hover:text-white'
-                }`}
+                className={`px-3 py-1.5 border font-mono-tech text-[11px] uppercase tracking-wider transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 ${active
+                  ? `${style.border} ${style.bg} ${style.text} font-semibold shadow-[0_0_12px_rgba(0,217,255,0.15)]`
+                  : 'border-white/15 bg-[#0C0F15] text-[#CBD5E1] hover:border-white/30 hover:text-white'
+                  }`}
               >
-                {m.index} · {m.type}
+                <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                <span>{m.index} · {m.type}</span>
               </button>
             );
           })}
@@ -80,16 +88,16 @@ export function ExperienceSection() {
 
           {EXPERIENCE_TIMELINE.map((item) => {
             const isHighlighted = focusedId === item.id;
+            const style = TYPE_STYLES[item.type] ?? TYPE_STYLES.Education;
             return (
               <article
                 id={`milestone-${item.id}`}
                 key={item.id}
                 onMouseEnter={() => setFocusedId(item.id)}
-                className={`exp-milestone relative w-full lg:w-[44vw] xl:w-[38vw] shrink-0 border p-7 sm:p-9 flex flex-col justify-between gap-8 transition-colors duration-150 ${
-                  isHighlighted
-                    ? 'border-[#00D9FF]/60 bg-[#10131A]/95'
-                    : 'border-white/15 bg-[#0C0F15]/92'
-                }`}
+                className={`exp-milestone relative w-full lg:w-[44vw] xl:w-[38vw] shrink-0 border p-7 sm:p-9 flex flex-col justify-between gap-8 transition-colors duration-150 ${isHighlighted
+                  ? 'border-[#00D9FF]/60 bg-[#10131A]/95 shadow-[0_8px_32px_rgba(0,0,0,0.5)]'
+                  : 'border-white/15 bg-[#0C0F15]/92'
+                  }`}
               >
                 <span
                   aria-hidden="true"
@@ -101,17 +109,16 @@ export function ExperienceSection() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-3 pb-4 border-b border-white/10">
                     <span
-                      className={`font-display text-4xl font-extrabold tabular-nums ${
-                        isHighlighted ? 'text-[#00D9FF]' : 'text-[#7DD3FC]'
-                      }`}
+                      className={`font-display text-4xl font-extrabold tabular-nums ${isHighlighted ? 'text-[#00D9FF]' : 'text-[#38BDF8]'
+                        }`}
                     >
                       {item.index}
                     </span>
                     <div className="text-right">
-                      <p className="font-mono-tech text-[11px] uppercase tracking-widest text-[#FCD34D] font-semibold">
+                      <p className={`font-mono-tech text-[11px] uppercase tracking-widest font-semibold px-2 py-0.5 border ${style.border} ${style.bg} ${style.text}`}>
                         {item.type}
                       </p>
-                      <p className="font-mono-tech text-xs text-[#7D8CA3]">{item.period}</p>
+                      <p className="font-mono-tech text-xs text-[#94A3B8] mt-1">{item.period}</p>
                     </div>
                   </div>
 
@@ -119,12 +126,12 @@ export function ExperienceSection() {
                     <h3 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                       {item.role}
                     </h3>
-                    <p className="font-mono-tech text-xs uppercase tracking-wider text-[#7DD3FC] mt-1.5">
+                    <p className={`font-mono-tech text-xs uppercase tracking-wider mt-1.5 font-medium ${style.text}`}>
                       {item.organization}
                     </p>
                   </div>
 
-                  <p className="text-sm sm:text-base leading-relaxed text-[#D5DDE8]">
+                  <p className="text-sm sm:text-base leading-relaxed text-[#F1F5F9]">
                     {item.summary}
                   </p>
                 </div>

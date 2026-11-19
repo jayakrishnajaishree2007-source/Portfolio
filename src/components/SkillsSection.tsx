@@ -22,11 +22,11 @@ const SKILL_PROJECT_LINKS: Record<string, string[]> = {
 };
 
 const CATEGORY_TEXT_CLASS: Record<string, string> = {
-  Networking: 'text-[#7DD3FC] hover:text-[#00D9FF]',
-  'AI / ML': 'text-[#FCD34D]/90 hover:text-[#00D9FF]',
-  Languages: 'text-white hover:text-[#00D9FF]',
-  'Web & Systems': 'text-[#D5DDE8] hover:text-[#00D9FF]',
-  Infrastructure: 'text-[#A5B4FC] hover:text-[#00D9FF]',
+  Programming: 'text-[#38BDF8] hover:text-white',
+  'Web Development': 'text-[#34D399] hover:text-white',
+  Networking: 'text-[#00D9FF] hover:text-white',
+  'AI / Machine Learning': 'text-[#C084FC] hover:text-white',
+  'Databases & Tools': 'text-[#FCD34D] hover:text-white',
 };
 
 export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
@@ -154,14 +154,14 @@ export function SkillsSection({ onSelectProject }: SkillsSectionProps) {
             </div>
 
             <div>
-              <p className="font-mono-tech text-xs uppercase tracking-widest text-[#7DD3FC]">
+              <p className="font-mono-tech text-xs uppercase tracking-widest text-[#00D9FF] font-semibold">
                 {activeItem.category}
               </p>
               <h3 className="font-display text-3xl font-extrabold text-white mt-1">
                 {activeItem.name}
               </h3>
-              <p className="text-sm sm:text-base text-[#7D8CA3] mt-2 leading-relaxed">
-                Applied across: <strong className="text-[#D5DDE8]">{activeItem.context}</strong>
+              <p className="text-sm sm:text-base text-[#94A3B8] mt-2 leading-relaxed">
+                Applied across: <strong className="text-white font-medium">{activeItem.context}</strong>
               </p>
             </div>
 

@@ -47,13 +47,13 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 aria-hidden="true"
                 className="mt-2.5 h-[2px] w-7 bg-[#00D9FF] shrink-0"
               />
-              <p className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#E0F2FE]">
-                {PROFILE.tagline}
+              <p className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
+                Engineering <span className="gradient-text-cyan">ideas</span> into <span className="gradient-text-emerald">real-world systems</span>.
               </p>
             </div>
 
-            <p className="hero-stagger text-sm sm:text-base leading-relaxed text-[#D5DDE8] max-w-xl">
-              {PROFILE.heroIntro}
+            <p className="hero-stagger text-sm sm:text-base leading-relaxed text-[#F1F5F9] max-w-xl">
+              Diploma student in <span className="text-[#38BDF8] font-semibold">Computer Networking</span> at PSG Polytechnic College building <span className="text-[#67E8F9] font-medium">full-stack web platforms</span>, relational database architectures, <span className="text-[#C084FC] font-medium">AI-assisted study systems</span>, and <span className="text-[#FCD34D] font-medium">Segment Routing</span> traffic engineering workflows.
             </p>
 
             <div className="hero-stagger pt-2 flex flex-wrap items-center gap-4">
@@ -163,13 +163,14 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             onClick={() => onNavigate('achievements')}
             className="p-4 sm:p-5 text-left hover:bg-[#10131A] transition-colors group focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
           >
-            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#FCD34D] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#FCD34D] rounded-full inline-block" />
               Academic Rank
             </p>
-            <p className="font-display text-lg sm:text-xl font-extrabold text-[#FCD34D] mt-1 tabular-nums group-hover:text-white transition-colors">
+            <p className="font-display text-lg sm:text-xl font-extrabold text-[#FDE047] mt-1 tabular-nums group-hover:text-white transition-colors">
               10 CGPA · 1st Rank
             </p>
-            <p className="font-mono-tech text-[11px] text-[#7D8CA3] mt-0.5">
+            <p className="font-mono-tech text-[11px] text-[#CBD5E1] mt-0.5">
               3rd Semester · DCN
             </p>
           </button>
@@ -179,13 +180,14 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             onClick={() => onNavigate('achievements')}
             className="p-4 sm:p-5 text-left hover:bg-[#10131A] transition-colors group focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
           >
-            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#34D399] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#34D399] rounded-full inline-block" />
               National Forum
             </p>
-            <p className="font-display text-lg sm:text-xl font-extrabold text-[#FCD34D] mt-1 group-hover:text-white transition-colors">
+            <p className="font-display text-lg sm:text-xl font-extrabold text-[#34D399] mt-1 group-hover:text-white transition-colors">
               1st Prize · SanTekFest 2K26
             </p>
-            <p className="font-mono-tech text-[11px] text-[#7D8CA3] mt-0.5">
+            <p className="font-mono-tech text-[11px] text-[#CBD5E1] mt-0.5">
               Paper Presentation
             </p>
           </button>
@@ -195,13 +197,14 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             onClick={() => onNavigate('projects')}
             className="p-4 sm:p-5 text-left hover:bg-[#10131A] transition-colors group focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
           >
-            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#38BDF8] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#38BDF8] rounded-full inline-block" />
               Engineering Work
             </p>
-            <p className="font-display text-lg sm:text-xl font-extrabold text-white mt-1 tabular-nums group-hover:text-[#00D9FF] transition-colors">
+            <p className="font-display text-lg sm:text-xl font-extrabold text-[#38BDF8] mt-1 tabular-nums group-hover:text-white transition-colors">
               4 Core Systems
             </p>
-            <p className="font-mono-tech text-[11px] text-[#7D8CA3] mt-0.5">
+            <p className="font-mono-tech text-[11px] text-[#CBD5E1] mt-0.5">
               Full-Stack · AI · Segment Routing
             </p>
           </button>
@@ -213,14 +216,15 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
             data-cursor="STUDIO"
             className="p-4 sm:p-5 text-left hover:bg-[#10131A] transition-colors group focus-visible:outline-2 focus-visible:outline-[#00D9FF]"
           >
-            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#7DD3FC]">
+            <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#C084FC] font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#C084FC] rounded-full inline-block" />
               Official Web Studio
             </p>
-            <p className="font-display text-lg sm:text-xl font-extrabold text-[#00D9FF] mt-1 inline-flex items-center gap-1.5 group-hover:text-white transition-colors">
+            <p className="font-display text-lg sm:text-xl font-extrabold text-[#C084FC] mt-1 inline-flex items-center gap-1.5 group-hover:text-white transition-colors">
               <span>{PROFILE.servicesDomain}</span>
-              <ArrowUpRight className="w-4 h-4 text-[#00D9FF]" />
+              <ArrowUpRight className="w-4 h-4 text-[#C084FC]" />
             </p>
-            <p className="font-mono-tech text-[11px] text-[#7D8CA3] mt-0.5">
+            <p className="font-mono-tech text-[11px] text-[#CBD5E1] mt-0.5">
               Custom Web Engineering
             </p>
           </a>
