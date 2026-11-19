@@ -869,7 +869,10 @@ export function ChromeScene3D({
   }, [cameraMode]);
 
   return (
-    <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none">
+    <div
+      aria-hidden="true"
+      className="fixed inset-0 z-0 pointer-events-none opacity-40 sm:opacity-55 lg:opacity-100 transition-opacity duration-300"
+    >
       <WebGLErrorBoundary
         fallback={<div aria-hidden="true" className="w-full h-full bg-[#080A0E]" />}
       >

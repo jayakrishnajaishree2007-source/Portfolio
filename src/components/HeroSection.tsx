@@ -29,14 +29,14 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
     >
       <div className="max-w-[1440px] mx-auto w-full px-5 sm:px-8 lg:px-12 space-y-12">
         {/* Precision Studio Top Index Bar */}
-        <div className="hero-stagger flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/10 font-mono-tech text-xs tracking-[0.18em]">
+        <div className="hero-stagger flex flex-wrap items-center justify-between gap-4 p-4 lg:p-0 lg:pb-5 bg-[#0C0F15]/85 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-none lg:border-b lg:border-white/10 font-mono-tech text-xs tracking-[0.18em] shadow-[0_8px_24px_rgba(0,0,0,0.4)] lg:shadow-none">
           <span className="text-[#00D9FF] font-semibold uppercase">01 · Studio Index</span>
           <span className="uppercase text-[#7DD3FC]">{PROFILE.roleLine}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-          {/* Left Oversized Liquid-Chrome Typography */}
-          <div className="lg:col-span-7 space-y-6 hero-scrub-title">
+          {/* Left Oversized Liquid-Chrome Typography with Mobile Readability Scrim */}
+          <div className="lg:col-span-7 space-y-6 hero-scrub-title p-6 sm:p-8 lg:p-0 bg-[#0C0F15]/85 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none border border-white/15 lg:border-none shadow-[0_16px_40px_rgba(0,0,0,0.5)] lg:shadow-none">
             <h1 className="hero-stagger font-display font-extrabold uppercase leading-[0.94] tracking-[-0.03em] text-[clamp(1.65rem,7.5vw,3.6rem)] lg:text-[clamp(2.9rem,4.6vw,5.1rem)] sm:whitespace-nowrap">
               <span className="chrome-text">{PROFILE.heroDisplayName}</span>
               <span className="text-[#00D9FF]">.</span>
@@ -47,12 +47,12 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                 aria-hidden="true"
                 className="mt-2.5 h-[2px] w-7 bg-[#00D9FF] shrink-0"
               />
-              <p className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white">
+              <p className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
                 Engineering <span className="gradient-text-cyan">ideas</span> into <span className="gradient-text-emerald">real-world systems</span>.
               </p>
             </div>
 
-            <p className="hero-stagger text-sm sm:text-base leading-relaxed text-[#F1F5F9] max-w-xl">
+            <p className="hero-stagger text-sm sm:text-base leading-relaxed text-[#F1F5F9] max-w-xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Diploma student in <span className="text-[#38BDF8] font-semibold">Computer Networking</span> at PSG Polytechnic College building <span className="text-[#67E8F9] font-medium">full-stack web platforms</span>, relational database architectures, <span className="text-[#C084FC] font-medium">AI-assisted study systems</span>, and <span className="text-[#FCD34D] font-medium">Segment Routing</span> traffic engineering workflows.
             </p>
 
