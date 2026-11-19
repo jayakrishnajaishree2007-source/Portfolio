@@ -44,8 +44,9 @@ export function AchievementsSection() {
       ref={sectionRef}
       className="relative py-24 sm:py-32 border-b border-white/10 overflow-hidden"
     >
-      <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
+      <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 relative">
+        {/* Section Header with Frosted Glass Backdrop */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 p-6 sm:p-8 border border-white/15 bg-[#0C0F15]/90 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
           <div>
             <p className="font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
               06 / Verified Recognition
@@ -54,13 +55,13 @@ export function AchievementsSection() {
               <span className="text-[#00D9FF]">Achievements</span> &amp; Distinctions
             </h2>
           </div>
-          <p className="text-sm sm:text-base text-[#D5DDE8] max-w-md">
+          <p className="text-sm sm:text-base text-[#D5DDE8] max-w-md leading-relaxed">
             Documented academic honors, leadership service, and research milestones across state and national technical forums.
           </p>
         </div>
 
-        {/* Monumental Obsidian & Chrome Editorial Rows */}
-        <div className="border-t border-white/15">
+        {/* Monumental Obsidian & Chrome Editorial Slab with Frosted Glass Blur */}
+        <div className="border border-white/15 bg-[#0C0F15]/90 backdrop-blur-md divide-y divide-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.55)]">
           {ACHIEVEMENTS.map((item) => {
             let animatedMetric = item.metric;
             if (item.numericTarget !== undefined) {
@@ -83,7 +84,7 @@ export function AchievementsSection() {
             return (
               <article
                 key={item.id}
-                className="ach-row group border-b border-white/15 py-8 sm:py-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center hover:bg-[#10131A]/80 transition-colors px-2 sm:px-4"
+                className="ach-row group py-8 sm:py-9 px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center hover:bg-[#10131A]/95 transition-all duration-200"
               >
                 <div className="lg:col-span-2 font-mono-tech text-xs uppercase tracking-widest text-[#94A3B8]">
                   Index / {item.index}
@@ -117,4 +118,3 @@ export function AchievementsSection() {
     </section>
   );
 }
-
