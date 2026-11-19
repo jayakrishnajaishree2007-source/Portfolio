@@ -11,9 +11,9 @@ const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 /* ─── Boot sequence telemetry lines ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 150 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 320 },
-  { text: '> RENDER PIPELINE — READY', delay: 480 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 250 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 550 },
+  { text: '> RENDER PIPELINE — READY', delay: 850 },
 ];
 
 /* ─── Side telemetry data for portfolio stage ─── */
@@ -77,7 +77,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [handleSkip]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 1: Quick Boot Sequence (0 – 1.1s)
+     PHASE 1: Boot Sequence (0 – 1.5s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'boot') return;
@@ -85,8 +85,8 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    // Trigger exclamation pop
-    timers.push(setTimeout(() => setStage('exclamation'), 1100));
+    // Trigger exclamation pop at 1.5s
+    timers.push(setTimeout(() => setStage('exclamation'), 1500));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
