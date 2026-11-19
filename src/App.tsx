@@ -370,7 +370,7 @@ function PortfolioShell() {
 
       <main className="relative z-10">
         <HeroSection onNavigate={handleNavigate} />
-        <AboutSection />
+        <AboutSection onNavigate={handleNavigate} />
         <ProjectsSection onSelectProject={setSelectedProject} />
         <ExperienceSection />
         <SkillsSection onSelectProject={setSelectedProject} />
