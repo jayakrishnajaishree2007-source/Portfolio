@@ -47,8 +47,8 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left: Clean Editorial Narrative & Pillars */}
           <div className="lg:col-span-7 space-y-8 about-scrub-copy">
-            {/* Narrative Editorial Card with Frosted Glass Blur Backdrop */}
-            <div className="p-6 sm:p-8 border border-white/15 bg-[#0C0F15]/90 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.45)] space-y-6">
+            {/* Narrative Editorial Card with Subtle Frosted Glass Blur Backdrop */}
+            <div className="p-6 sm:p-8 border border-white/15 bg-[#0C0F15]/80 backdrop-blur-sm shadow-[0_12px_32px_rgba(0,0,0,0.35)] space-y-6">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 font-mono-tech text-xs uppercase tracking-[0.22em] text-[#00D9FF]">
                   <Sparkles className="w-3.5 h-3.5" />
@@ -79,7 +79,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
             </div>
 
             {/* Clean 3-Column Institutional Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 border border-white/15 divide-y sm:divide-y-0 sm:divide-x divide-white/15 bg-[#0C0F15]/90 backdrop-blur-md shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 border border-white/15 divide-y sm:divide-y-0 sm:divide-x divide-white/15 bg-[#0C0F15]/85 backdrop-blur-sm shadow-[0_12px_32px_rgba(0,0,0,0.35)]">
               <div className="p-6 space-y-1.5">
                 <p className="font-mono-tech text-[10px] uppercase tracking-widest text-[#38BDF8] flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5" />
@@ -160,7 +160,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
 
           {/* Right: Elegant, Clean Obsidian Specification Card */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end w-full">
-            <div className="about-scrub-portrait w-full max-w-[420px] border border-white/15 bg-[#0C0F15]/95 backdrop-blur-md p-8 sm:p-10 shadow-[0_24px_75px_rgba(0,0,0,0.7)] space-y-7">
+            <div className="about-scrub-portrait w-full max-w-[420px] border border-white/15 bg-[#0C0F15]/90 backdrop-blur-sm p-8 sm:p-10 shadow-[0_24px_75px_rgba(0,0,0,0.7)] space-y-7">
               {/* Card Header Badge */}
               <div className="flex items-center justify-between border-b border-white/10 pb-5">
                 <div>
