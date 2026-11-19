@@ -12,6 +12,7 @@ import { CustomCursor } from './components/CustomCursor';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ExperienceSection } from './components/ExperienceSection';
 import { HeroSection } from './components/HeroSection';
+import { IntroSequence } from './components/IntroSequence';
 import { Navbar, SectionId } from './components/Navbar';
 import { ProjectsSection } from './components/ProjectsSection';
 import { SectionRail } from './components/SectionRail';
@@ -44,10 +45,11 @@ function PortfolioShell() {
 
   const [activeSection, setActiveSection] = useState<SectionId>('home');
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
-    document.body.style.overflow = selectedProject ? 'hidden' : '';
-    if (selectedProject) {
+    document.body.style.overflow = selectedProject || showIntro ? 'hidden' : '';
+    if (selectedProject || showIntro) {
       lenisRef.current?.stop();
     } else {
       lenisRef.current?.start();
@@ -56,7 +58,7 @@ function PortfolioShell() {
       document.body.style.overflow = '';
       lenisRef.current?.start();
     };
-  }, [selectedProject]);
+  }, [selectedProject, showIntro]);
 
   // Lenis + GSAP ScrollTrigger Synchronized Ticker (Zero React re-renders on scroll)
   useEffect(() => {
@@ -380,6 +382,10 @@ function PortfolioShell() {
       </main>
 
       <SectionRail activeSection={activeSection} onNavigate={handleNavigate} />
+
+      {showIntro && (
+        <IntroSequence onComplete={() => setShowIntro(false)} />
+      )}
 
       <Suspense fallback={null}>
         {selectedProject && (
