@@ -25,7 +25,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
           <span className="text-[#FCD34D]">/</span>
           <span className="text-[#34D399]">Full-Stack Architecture</span>
           <span className="text-[#00D9FF]">/</span>
-          <span className="text-[#FDE047]">PSG Polytechnic College · 10.00 CGPA</span>
+          <span className="text-[#FDE047]">PSG Polytechnic College · 9.92 CGPA</span>
           <span className="text-[#FCD34D]">/</span>
           <span className="text-[#38BDF8]">CNA Secretary 2026–27</span>
           <span className="text-[#00D9FF]">/</span>
@@ -86,7 +86,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
                   PSG Polytechnic
                 </p>
                 <p className="font-mono-tech text-xs text-[#34D399]">
-                  10.00 CGPA · 1st Rank
+                  9.92 CGPA · 4th Sem (1st Rank)
                 </p>
               </div>
 
@@ -215,7 +215,7 @@ export function AboutSection({ onNavigate }: AboutSectionProps) {
                 </div>
                 <div className="flex items-center justify-between text-[#94A3B8]">
                   <span>Academic Standing:</span>
-                  <span className="text-[#FDE047] font-semibold">10.00 CGPA (1st Rank)</span>
+                  <span className="text-[#FDE047] font-semibold">9.92 CGPA (as of 4th Sem · 1st Rank)</span>
                 </div>
                 <div className="flex items-center justify-between text-[#94A3B8]">
                   <span>Current Role:</span>

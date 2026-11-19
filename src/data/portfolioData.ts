@@ -105,12 +105,11 @@ export const ACHIEVEMENTS: AchievementItem[] = [
   {
     id: 'ach-rank1-sem3',
     index: '01',
-    metric: '10',
-    numericTarget: 10,
-    title: 'First Rank — 3rd Semester',
-    subtitle: '10 CGPA · Academic Excellence',
+    metric: '9.92',
+    title: 'Department Academic Standing',
+    subtitle: '9.92 CGPA as of 4th Semester · First Rank',
     detail:
-      'Achieved 1st Rank in the 3rd Semester with a 10 CGPA in Diploma in Computer Networking at PSG Polytechnic College.',
+      'Holding a 9.92 cumulative CGPA as of 4th Semester with 1st Rank distinction in Diploma in Computer Networking at PSG Polytechnic College, including a perfect 10.00 CGPA in 3rd Semester.',
     accent: 'cyan',
   },
   {
@@ -727,12 +726,12 @@ export const INITIAL_ALBUM_PHOTOS: AlbumPhoto[] = [
   {
     "id": "photo-award-11",
     "title": "Official Statement of Grades — 10.00 CGPA",
-    "caption": "Official Diploma Examinations Statement of Grades recording a flawless 10.00 CGPA with straight 'O' (Outstanding) grades across all theory & laboratory subjects.",
+    "caption": "Official Diploma Examinations Statement of Grades recording a flawless 10.00 CGPA in 3rd Semester with straight 'O' (Outstanding) grades across all subjects, contributing to an overall 9.92 CGPA as of 4th Semester.",
     "category": "Awards & Events",
     "date": "October 2025 Exams",
     "location": "Autonomous Exam Wing, PSG Tech",
     "imageUrl": "/assets/album/awards/award-11.jpeg",
-    "tag": "Perfect 10 CGPA",
+    "tag": "10 CGPA / 9.92 Overall",
     "color": "#FCD34D"
   },
   {
