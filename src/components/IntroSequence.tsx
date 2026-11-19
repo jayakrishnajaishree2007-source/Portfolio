@@ -11,11 +11,9 @@ const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 /* ─── Boot sequence telemetry lines ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 180 },
-  { text: '> LOADING CORE MODULES ■■■■■■■■ 100%', delay: 350 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 520 },
-  { text: '> RENDER PIPELINE — INITIALIZED', delay: 680 },
-  { text: '> ENTERING STUDIO ...', delay: 850 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 150 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 320 },
+  { text: '> RENDER PIPELINE — READY', delay: 480 },
 ];
 
 /* ─── Side telemetry data for portfolio stage ─── */
@@ -36,7 +34,7 @@ const RIGHT_TELEMETRY = [
 /* ─── Stage type ─── */
 type Stage =
   | 'boot'
-  | 'convergence'
+  | 'exclamation'
   | 'flash'
   | 'name-glitch'
   | 'name-hold'
@@ -50,7 +48,6 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   const [bootLineIdx, setBootLineIdx] = useState(-1);
   const [morphLocked, setMorphLocked] = useState<boolean[]>([]);
   const [showEnter, setShowEnter] = useState(false);
-  const [showPortraitFrame, setShowPortraitFrame] = useState(false);
   const [showSideTelemetry, setShowSideTelemetry] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -80,7 +77,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [handleSkip]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 1: Boot Sequence (0 – 1.8s)
+     PHASE 1: Quick Boot Sequence (0 – 1.1s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'boot') return;
@@ -88,41 +85,44 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    timers.push(setTimeout(() => setStage('convergence'), 1800));
+    // Trigger exclamation pop
+    timers.push(setTimeout(() => setStage('exclamation'), 1100));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2: Particle Convergence (1.8 – 3.2s)
+     PHASE 2: Exclamation Mark Pop (!) (1.1 – 2.0s)
+     Pops in center with kinetic spring & shockwaves
      ═══════════════════════════════════════════════ */
   useEffect(() => {
-    if (stage !== 'convergence') return;
-    const t = setTimeout(() => setStage('flash'), 1400);
+    if (stage !== 'exclamation') return;
+    const t = setTimeout(() => setStage('flash'), 950);
     return () => clearTimeout(t);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2b: Flash Frame (3.2 – 3.5s)
+     PHASE 2b: Flash Frame on impact (2.0 – 2.25s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'flash') return;
-    const t = setTimeout(() => setStage('name-glitch'), 300);
+    const t = setTimeout(() => setStage('name-glitch'), 220);
     return () => clearTimeout(t);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 3: Name Reveal with Glitch (3.5 – 4.7s)
+     PHASE 3: Name Burst with Glitch (2.25 – 3.4s)
+     "JAYAKRISHNA" appears where "!" popped
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'name-glitch') return;
     setDisplayText('JAYAKRISHNA');
-    const t1 = setTimeout(() => setStage('name-hold'), 1200);
+    const t1 = setTimeout(() => setStage('name-hold'), 1100);
     return () => clearTimeout(t1);
   }, [stage]);
 
   useEffect(() => {
     if (stage !== 'name-hold') return;
-    const t = setTimeout(() => setStage('morph'), 800);
+    const t = setTimeout(() => setStage('morph'), 750);
     return () => clearTimeout(t);
   }, [stage]);
 
@@ -178,23 +178,21 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
   /* ═══════════════════════════════════════════════
      PHASE 5: Portfolio Stage — Staggered UI Reveal
-     (Waits for user to click "Enter Studio")
+     (Waits exclusively for user click on "Enter Studio")
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'portfolio') return;
-    const t1 = setTimeout(() => setShowPortraitFrame(true), 250);
-    const t2 = setTimeout(() => setShowSideTelemetry(true), 500);
-    const t3 = setTimeout(() => setShowEnter(true), 750);
+    const t1 = setTimeout(() => setShowSideTelemetry(true), 400);
+    const t2 = setTimeout(() => setShowEnter(true), 650);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
     };
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     BACKGROUND: Warp-Speed Particle Starfield
+     BACKGROUND: Particle Starfield
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -212,7 +210,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     };
     window.addEventListener('resize', onResize);
 
-    const PARTICLE_COUNT = 450;
+    const PARTICLE_COUNT = 400;
 
     interface Particle {
       x: number;
@@ -244,7 +242,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     let animationId: number;
 
     const render = () => {
-      ctx.fillStyle = 'rgba(8, 10, 14, 0.18)';
+      ctx.fillStyle = 'rgba(8, 10, 14, 0.2)';
       ctx.fillRect(0, 0, width, height);
 
       const cx = width / 2;
@@ -252,11 +250,11 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       const currentStage = stageRef.current;
 
       let speedMul = 1;
-      if (currentStage === 'convergence') speedMul = 8;
-      else if (currentStage === 'flash') speedMul = 15;
+      if (currentStage === 'exclamation') speedMul = 4;
+      else if (currentStage === 'flash') speedMul = 14;
       else if (currentStage === 'name-glitch' || currentStage === 'name-hold') speedMul = 2;
-      else if (currentStage === 'morph') speedMul = 3.5;
-      else if (currentStage === 'portfolio') speedMul = 0.8;
+      else if (currentStage === 'morph') speedMul = 3;
+      else if (currentStage === 'portfolio') speedMul = 0.7;
       else if (currentStage === 'exit') speedMul = 6;
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -330,9 +328,28 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       {/* ── Particle Starfield Canvas ── */}
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
 
+      {/* ── Background Embedded Portrait (Seamlessly Melted into Darkness) ── */}
+      <div
+        className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-all duration-1000 ease-out z-[1] ${
+          stage === 'portfolio' ? 'opacity-40 scale-100' : 'opacity-0 scale-95'
+        }`}
+        style={{
+          maskImage:
+            'radial-gradient(ellipse 65% 70% at 50% 48%, black 20%, transparent 75%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 65% 70% at 50% 48%, black 20%, transparent 75%)',
+        }}
+      >
+        <img
+          src="/assets/jk-intro-portrait.jpg"
+          alt="Jayakrishna J"
+          className="w-auto h-[62vh] sm:h-[72vh] max-w-none object-contain mix-blend-screen contrast-125 brightness-110"
+        />
+      </div>
+
       {/* ── CRT Scan Lines Overlay ── */}
       <div
-        className="absolute inset-0 pointer-events-none z-[1]"
+        className="absolute inset-0 pointer-events-none z-[2]"
         style={{
           background:
             'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px)',
@@ -342,14 +359,14 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
       {/* ── Vignette Overlay ── */}
       <div
-        className="absolute inset-0 pointer-events-none z-[2]"
+        className="absolute inset-0 pointer-events-none z-[3]"
         style={{
           background:
             'radial-gradient(ellipse at center, transparent 35%, rgba(8,10,14,0.7) 100%)',
         }}
       />
 
-      {/* ── White Flash Frame ── */}
+      {/* ── White Flash Frame on Exclamation Impact ── */}
       <div
         className={`absolute inset-0 z-[50] pointer-events-none transition-opacity ${
           stage === 'flash' ? 'opacity-100' : 'opacity-0'
@@ -357,7 +374,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         style={{
           background:
             'radial-gradient(circle at center, #ffffff 0%, rgba(0,217,255,0.4) 50%, transparent 80%)',
-          transitionDuration: stage === 'flash' ? '80ms' : '350ms',
+          transitionDuration: stage === 'flash' ? '70ms' : '300ms',
         }}
       />
 
@@ -436,10 +453,10 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
             {BOOT_LINES.map((line, idx) => (
               <div
                 key={idx}
-                className={`transition-all duration-200 ${
+                className={`transition-all duration-150 ${
                   idx <= bootLineIdx
                     ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 -translate-x-4'
+                    : 'opacity-0 -translate-x-3'
                 }`}
               >
                 <span className="text-[#00D9FF]">{line.text.slice(0, 2)}</span>
@@ -455,21 +472,32 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           </div>
         )}
 
-        {/* PHASE 2: Convergence Beacon */}
-        {stage === 'convergence' && (
+        {/* PHASE 2: Exclamation Mark (!) Pop */}
+        {stage === 'exclamation' && (
           <div className="relative flex items-center justify-center">
+            {/* Expanding shockwave rings */}
+            <div className="absolute w-28 h-28 rounded-full border border-[#00D9FF] animate-ping opacity-75" />
             <div
-              className="w-5 h-5 rounded-full bg-white"
-              style={{
-                boxShadow:
-                  '0 0 60px #00D9FF, 0 0 120px #00D9FF, 0 0 200px rgba(0,217,255,0.4)',
-                animation: 'ping 0.8s cubic-bezier(0,0,0.2,1) infinite',
-              }}
+              className="absolute w-44 h-44 rounded-full border border-[#00D9FF]/40 animate-ping opacity-40"
+              style={{ animationDuration: '1.2s' }}
             />
-            <div
-              className="absolute w-3 h-3 rounded-full bg-[#00D9FF]"
-              style={{ boxShadow: '0 0 30px #00D9FF' }}
-            />
+
+            {/* Kinetic Pop Exclamation Mark */}
+            <div className="relative flex items-center justify-center animate-exclamation-pop">
+              <span
+                className="font-display font-black text-[clamp(5rem,16vw,10rem)] leading-none select-none tracking-wider"
+                style={{
+                  background:
+                    'linear-gradient(180deg, #FFFFFF 0%, #7DD3FC 45%, #00D9FF 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  filter:
+                    'drop-shadow(0 0 25px #00D9FF) drop-shadow(0 0 50px rgba(0,217,255,0.85)) drop-shadow(0 0 80px rgba(0,217,255,0.4))',
+                }}
+              >
+                !
+              </span>
+            </div>
           </div>
         )}
 
@@ -478,77 +506,11 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
              ═══════════════════════════════════════ */}
         {isNameVisible && (
           <div className="relative flex flex-col items-center justify-center w-full">
-
-            {/* ── Data-Rain Particle Portrait (Reveals seamlessly above PORTFOLIO) ── */}
-            <div
-              className={`transition-all duration-1000 ease-out flex flex-col items-center ${
-                stage === 'portfolio'
-                  ? 'opacity-100 scale-100 mb-2 sm:mb-4 max-h-[380px]'
-                  : 'opacity-0 scale-90 mb-0 max-h-0 pointer-events-none overflow-hidden'
-              }`}
-            >
-              <div className="relative">
-                {/* Tech corner brackets */}
-                {showPortraitFrame && (
-                  <>
-                    <div className="absolute -top-2.5 -left-2.5 w-6 h-6 border-t-2 border-l-2 border-[#00D9FF] shadow-[0_0_12px_#00D9FF] z-20 animate-fade-in-up" />
-                    <div className="absolute -top-2.5 -right-2.5 w-6 h-6 border-t-2 border-r-2 border-[#00D9FF] shadow-[0_0_12px_#00D9FF] z-20 animate-fade-in-up" />
-                    <div className="absolute -bottom-2.5 -left-2.5 w-6 h-6 border-b-2 border-l-2 border-[#00D9FF] shadow-[0_0_12px_#00D9FF] z-20 animate-fade-in-up" />
-                    <div className="absolute -bottom-2.5 -right-2.5 w-6 h-6 border-b-2 border-r-2 border-[#00D9FF] shadow-[0_0_12px_#00D9FF] z-20 animate-fade-in-up" />
-                  </>
-                )}
-
-                {/* Portrait Frame */}
-                <div
-                  className="relative overflow-hidden"
-                  style={{
-                    width: 'clamp(170px, 24vw, 250px)',
-                    height: 'clamp(210px, 30vw, 310px)',
-                    boxShadow:
-                      '0 0 50px rgba(0,217,255,0.25), inset 0 0 30px rgba(0,217,255,0.1)',
-                    border: '1px solid rgba(0,217,255,0.3)',
-                    background: '#080A0E',
-                  }}
-                >
-                  <img
-                    src="/assets/jk-intro-portrait.jpg"
-                    alt="Jayakrishna J"
-                    className="w-full h-full object-cover object-top mix-blend-screen contrast-125 brightness-105"
-                  />
-
-                  {/* Gradient masks to seamlessly melt into obsidian space */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#080A0E] via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#080A0E]/50 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#080A0E]/30 via-transparent to-[#080A0E]/30 pointer-events-none" />
-
-                  {/* Laser scan line sweeping across matrix avatar */}
-                  {showPortraitFrame && (
-                    <div
-                      className="absolute left-0 right-0 h-[2px] bg-[#00D9FF] pointer-events-none"
-                      style={{
-                        animation: 'portraitScan 2.6s ease-in-out infinite alternate',
-                        boxShadow: '0 0 12px #00D9FF, 0 0 24px #00D9FF',
-                      }}
-                    />
-                  )}
-
-                  {/* HUD status overlays */}
-                  <div className="absolute top-2 left-2 flex items-center gap-1.5 font-mono-tech text-[8px] text-[#00D9FF] bg-[#080A0E]/80 px-1.5 py-0.5 border border-[#00D9FF]/30">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00D9FF] animate-ping" />
-                    <span>REC · LIVE</span>
-                  </div>
-                  <div className="absolute bottom-2 right-2 font-mono-tech text-[8px] text-[#7DD3FC]/80 bg-[#080A0E]/80 px-1.5 py-0.5 border border-white/10">
-                    <span>JK-ID // 002</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* ── Main Title with Glitch / Morph ── */}
             <h1
               className="font-display font-black uppercase leading-none whitespace-nowrap relative"
               style={{
-                fontSize: 'clamp(2.4rem, 10vw, 6.8rem)',
+                fontSize: 'clamp(2.5rem, 11vw, 7.5rem)',
                 letterSpacing: '0.06em',
               }}
             >
@@ -637,16 +599,16 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
             {/* ── Discipline Chips Array ── */}
             {stage === 'portfolio' && (
-              <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2 sm:gap-3 flex-wrap animate-fade-in-up">
-                <span className="px-2.5 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/20 bg-[#00D9FF]/5 backdrop-blur-sm">
+              <div className="mt-5 sm:mt-6 flex items-center justify-center gap-2 sm:gap-3 flex-wrap animate-fade-in-up">
+                <span className="px-3 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/30 bg-[#00D9FF]/10 backdrop-blur-md">
                   Computer Networking
                 </span>
                 <span className="text-[#00D9FF]/40 text-xs hidden sm:inline">•</span>
-                <span className="px-2.5 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/20 bg-[#00D9FF]/5 backdrop-blur-sm">
+                <span className="px-3 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/30 bg-[#00D9FF]/10 backdrop-blur-md">
                   Applied AI
                 </span>
                 <span className="text-[#00D9FF]/40 text-xs hidden sm:inline">•</span>
-                <span className="px-2.5 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/20 bg-[#00D9FF]/5 backdrop-blur-sm">
+                <span className="px-3 py-1 text-[9px] sm:text-[11px] font-mono-tech uppercase tracking-wider text-[#38BDF8] border border-[#00D9FF]/30 bg-[#00D9FF]/10 backdrop-blur-md">
                   Web Architecture
                 </span>
               </div>
@@ -657,7 +619,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               <button
                 type="button"
                 onClick={handleSkip}
-                className="group relative mt-6 sm:mt-7 inline-flex items-center gap-2.5 px-6 py-2.5 sm:px-8 sm:py-3 border border-[#00D9FF]/60 bg-[#00D9FF]/10 hover:bg-[#00D9FF] text-[#00D9FF] hover:text-[#080A0E] font-mono-tech text-xs uppercase tracking-[0.2em] font-semibold transition-all duration-300 shadow-[0_0_25px_rgba(0,217,255,0.25)] hover:shadow-[0_0_40px_rgba(0,217,255,0.6)] cursor-pointer animate-fade-in-up"
+                className="group relative mt-7 sm:mt-8 inline-flex items-center gap-2.5 px-7 py-3 sm:px-9 sm:py-3.5 border border-[#00D9FF]/70 bg-[#00D9FF]/15 hover:bg-[#00D9FF] text-[#00D9FF] hover:text-[#080A0E] font-mono-tech text-xs uppercase tracking-[0.2em] font-bold transition-all duration-300 shadow-[0_0_30px_rgba(0,217,255,0.3)] hover:shadow-[0_0_50px_rgba(0,217,255,0.7)] cursor-pointer animate-fade-in-up"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] group-hover:bg-[#080A0E] opacity-75" />
