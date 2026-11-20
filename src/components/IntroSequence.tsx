@@ -611,55 +611,24 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               )}
             </h1>
 
-            {/* ── Glowing Heroic Cyan Divider Line ── */}
-            {stage === 'portfolio' && (
-              <div
-                className="w-32 sm:w-48 h-px my-5 sm:my-6 animate-fade-in-up"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent, #00D9FF, transparent)',
-                  boxShadow: '0 0 10px #00D9FF',
-                }}
-              />
-            )}
-
-            {/* ── High-Tech Cybernetic Enter Studio Trigger ── */}
+            {/* ── Clean Luxury Enter Studio Action ── */}
             {showEnter && stage === 'portfolio' && (
-              <div className="relative group animate-fade-in-up">
-                {/* Outer Glow Halo on Hover */}
-                <div
-                  className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#00D9FF] via-[#38BDF8] to-[#00D9FF] opacity-35 blur-md group-hover:opacity-85 group-hover:blur-lg transition-all duration-500"
-                  aria-hidden="true"
-                />
+              <button
+                type="button"
+                onClick={handleSkip}
+                className="group relative mt-7 sm:mt-9 inline-flex items-center gap-3 px-7 py-3 sm:px-9 sm:py-3.5 rounded-full bg-[#0C1017]/80 hover:bg-[#00D9FF] border border-white/20 hover:border-[#00D9FF] text-[#E2E8F0] hover:text-[#080A0E] backdrop-blur-md transition-all duration-300 ease-out shadow-[0_8px_32px_rgba(0,0,0,0.6)] hover:shadow-[0_0_35px_rgba(0,217,255,0.4)] cursor-pointer active:scale-95 animate-fade-in-up"
+              >
+                {/* Subtle Cyan Indicator Dot */}
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00D9FF] group-hover:bg-[#080A0E] transition-colors duration-200 shadow-[0_0_6px_#00D9FF]" />
 
-                <button
-                  type="button"
-                  onClick={handleSkip}
-                  className="relative flex items-center gap-3.5 px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-[#080B10]/90 hover:bg-[#0C1018] border border-[#00D9FF]/70 hover:border-[#00D9FF] text-white shadow-[0_0_25px_rgba(0,217,255,0.3)] hover:shadow-[0_0_45px_rgba(0,217,255,0.6)] backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer active:scale-95"
-                >
-                  {/* Shimmer Light Beam Sweep */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-[#00D9FF]/25 to-transparent pointer-events-none animate-btn-shimmer"
-                  />
+                {/* Clean Precision Typography */}
+                <span className="font-mono-tech font-medium text-xs sm:text-[13px] uppercase tracking-[0.22em] transition-colors duration-200">
+                  Enter Studio
+                </span>
 
-                  {/* Pulsing Cyan Radar Beacon */}
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00D9FF] shadow-[0_0_10px_#00D9FF]" />
-                  </span>
-
-                  {/* Text Label */}
-                  <span className="font-display font-extrabold uppercase text-xs sm:text-sm tracking-[0.22em] text-[#F1F5F9] group-hover:text-white transition-colors duration-200 whitespace-nowrap">
-                    Enter Studio
-                  </span>
-
-                  {/* Interactive Arrow Badge */}
-                  <div className="w-6 h-6 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/40 flex items-center justify-center group-hover:bg-[#00D9FF] group-hover:border-[#00D9FF] transition-all duration-300">
-                    <ArrowRight className="w-3.5 h-3.5 text-[#00D9FF] group-hover:text-[#080A0E] group-hover:translate-x-0.5 transition-all duration-300" />
-                  </div>
-                </button>
-              </div>
+                {/* Minimal Arrow */}
+                <ArrowRight className="w-3.5 h-3.5 text-[#00D9FF] group-hover:text-[#080A0E] transition-all duration-300 group-hover:translate-x-1" />
+              </button>
             )}
           </div>
         )}
