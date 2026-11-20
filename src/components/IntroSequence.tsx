@@ -8,12 +8,12 @@ interface IntroSequenceProps {
 /* ─── Character set for kinetic scramble morph ─── */
 const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 
-/* ─── Boot sequence telemetry lines ─── */
+/* ─── Boot sequence telemetry lines (calibrated for 1.25s) ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 250 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 550 },
-  { text: '> RENDER PIPELINE — READY', delay: 850 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 200 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 450 },
+  { text: '> RENDER PIPELINE — READY', delay: 720 },
 ];
 
 /* ─── Side telemetry data for portfolio stage ─── */
@@ -77,7 +77,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [handleSkip]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 1: Boot Sequence (0 – 1.5s)
+     PHASE 1: Boot Sequence (0 – 1.25s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'boot') return;
@@ -85,8 +85,8 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    // Trigger exclamation pop at 1.5s
-    timers.push(setTimeout(() => setStage('exclamation'), 1500));
+    // Trigger exclamation pop at exactly 1.25s
+    timers.push(setTimeout(() => setStage('exclamation'), 1250));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
@@ -623,20 +623,43 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               />
             )}
 
-            {/* ── Enter Studio Trigger ── */}
+            {/* ── High-Tech Cybernetic Enter Studio Trigger ── */}
             {showEnter && stage === 'portfolio' && (
-              <button
-                type="button"
-                onClick={handleSkip}
-                className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 border border-[#00D9FF]/70 bg-[#00D9FF]/15 hover:bg-[#00D9FF] text-[#00D9FF] hover:text-[#080A0E] font-mono-tech text-xs sm:text-sm uppercase tracking-[0.22em] font-bold transition-all duration-300 shadow-[0_0_30px_rgba(0,217,255,0.35)] hover:shadow-[0_0_60px_rgba(0,217,255,0.7)] cursor-pointer animate-fade-in-up"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] group-hover:bg-[#080A0E] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D9FF] group-hover:bg-[#080A0E]" />
-                </span>
-                <span>Enter Studio</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
-              </button>
+              <div className="relative group animate-fade-in-up">
+                {/* Outer Glow Halo on Hover */}
+                <div
+                  className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#00D9FF] via-[#38BDF8] to-[#00D9FF] opacity-35 blur-md group-hover:opacity-85 group-hover:blur-lg transition-all duration-500"
+                  aria-hidden="true"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  className="relative flex items-center gap-3.5 px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-[#080B10]/90 hover:bg-[#0C1018] border border-[#00D9FF]/70 hover:border-[#00D9FF] text-white shadow-[0_0_25px_rgba(0,217,255,0.3)] hover:shadow-[0_0_45px_rgba(0,217,255,0.6)] backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer active:scale-95"
+                >
+                  {/* Shimmer Light Beam Sweep */}
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-[#00D9FF]/25 to-transparent pointer-events-none animate-btn-shimmer"
+                  />
+
+                  {/* Pulsing Cyan Radar Beacon */}
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00D9FF] shadow-[0_0_10px_#00D9FF]" />
+                  </span>
+
+                  {/* Text Label */}
+                  <span className="font-display font-extrabold uppercase text-xs sm:text-sm tracking-[0.22em] text-[#F1F5F9] group-hover:text-white transition-colors duration-200 whitespace-nowrap">
+                    Enter Studio
+                  </span>
+
+                  {/* Interactive Arrow Badge */}
+                  <div className="w-6 h-6 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/40 flex items-center justify-center group-hover:bg-[#00D9FF] group-hover:border-[#00D9FF] transition-all duration-300">
+                    <ArrowRight className="w-3.5 h-3.5 text-[#00D9FF] group-hover:text-[#080A0E] group-hover:translate-x-0.5 transition-all duration-300" />
+                  </div>
+                </button>
+              </div>
             )}
           </div>
         )}
