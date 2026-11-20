@@ -8,12 +8,12 @@ interface IntroSequenceProps {
 /* ─── Character set for kinetic scramble morph ─── */
 const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 
-/* ─── Boot sequence telemetry lines (calibrated for 1.25s) ─── */
+/* ─── Boot sequence telemetry lines (calibrated for 1.5s sequential printout) ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 200 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 450 },
-  { text: '> RENDER PIPELINE — READY', delay: 720 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 350 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 700 },
+  { text: '> RENDER PIPELINE — READY', delay: 1050 },
 ];
 
 /* ─── Side telemetry data for portfolio stage ─── */
@@ -77,7 +77,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [handleSkip]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 1: Boot Sequence (0 – 1.25s)
+     PHASE 1: Boot Sequence (0 – 1.5s Sequential Printout)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'boot') return;
@@ -85,8 +85,8 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    // Trigger exclamation pop at exactly 1.25s
-    timers.push(setTimeout(() => setStage('exclamation'), 1250));
+    // Trigger exclamation pop at exactly 1.5s
+    timers.push(setTimeout(() => setStage('exclamation'), 1500));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
@@ -454,28 +454,24 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
       {/* ── Center Stage ── */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl">
-        {/* PHASE 1: Boot Terminal */}
+        {/* PHASE 1: Sequential Terminal Printout */}
         {stage === 'boot' && (
-          <div className="relative flex flex-col items-start gap-1 font-mono-tech text-[11px] sm:text-xs text-[#38BDF8] max-w-md w-full px-4 sm:px-0">
-            {BOOT_LINES.map((line, idx) => (
+          <div className="relative flex flex-col items-start gap-1.5 font-mono-tech text-[11px] sm:text-xs text-[#38BDF8] max-w-md w-full px-4 sm:px-0">
+            {BOOT_LINES.slice(0, bootLineIdx + 1).map((line, idx) => (
               <div
                 key={idx}
-                className={`transition-all duration-150 ${
-                  idx <= bootLineIdx
-                    ? 'opacity-100 translate-x-0'
-                    : 'opacity-0 -translate-x-3'
-                }`}
+                className="flex items-center gap-1 animate-in fade-in slide-in-from-left-2 duration-150"
               >
-                <span className="text-[#00D9FF]">{line.text.slice(0, 2)}</span>
-                <span className="text-[#94A3B8]">{line.text.slice(2)}</span>
+                <span className="text-[#00D9FF] font-semibold">{line.text.slice(0, 2)}</span>
+                <span className="text-[#CBD5E1]">{line.text.slice(2)}</span>
+                {idx === bootLineIdx && (
+                  <span
+                    className="inline-block w-1.5 h-3 sm:h-3.5 bg-[#00D9FF] ml-1"
+                    style={{ animation: 'blink 0.6s step-end infinite' }}
+                  />
+                )}
               </div>
             ))}
-            {bootLineIdx >= 0 && (
-              <span
-                className="inline-block w-2 h-3.5 sm:h-4 bg-[#00D9FF] mt-1"
-                style={{ animation: 'blink 0.7s step-end infinite' }}
-              />
-            )}
           </div>
         )}
 
