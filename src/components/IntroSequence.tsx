@@ -611,24 +611,101 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               )}
             </h1>
 
-            {/* ── Clean Luxury Enter Studio Action ── */}
+            {/* ── Futuristic Angular Rectangular Button with Clipped Corners (Reference Design) ── */}
             {showEnter && stage === 'portfolio' && (
-              <button
-                type="button"
-                onClick={handleSkip}
-                className="group relative mt-7 sm:mt-9 inline-flex items-center gap-3 px-7 py-3 sm:px-9 sm:py-3.5 rounded-full bg-[#0C1017]/80 hover:bg-[#00D9FF] border border-white/20 hover:border-[#00D9FF] text-[#E2E8F0] hover:text-[#080A0E] backdrop-blur-md transition-all duration-300 ease-out shadow-[0_8px_32px_rgba(0,0,0,0.6)] hover:shadow-[0_0_35px_rgba(0,217,255,0.4)] cursor-pointer active:scale-95 animate-fade-in-up"
-              >
-                {/* Subtle Cyan Indicator Dot */}
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00D9FF] group-hover:bg-[#080A0E] transition-colors duration-200 shadow-[0_0_6px_#00D9FF]" />
+              <div className="relative mt-7 sm:mt-9 animate-fade-in-up">
+                {/* Outer container with hover scale and neon pulsing */}
+                <div className="relative group animate-neon-pulse transition-transform duration-300 hover:scale-[1.02]">
+                  {/* Top-Right Accent Rail */}
+                  <div
+                    className="absolute -top-[4px] right-4 sm:right-6 w-16 sm:w-24 h-[2.5px] bg-[#00E5FF] pointer-events-none transition-all duration-300 group-hover:w-24 sm:group-hover:w-32"
+                    style={{ boxShadow: '0 0 10px #00E5FF, 0 0 20px #00E5FF' }}
+                  />
 
-                {/* Clean Precision Typography */}
-                <span className="font-mono-tech font-medium text-xs sm:text-[13px] uppercase tracking-[0.22em] transition-colors duration-200">
-                  Enter Studio
-                </span>
+                  {/* Bottom-Left Accent Rail */}
+                  <div
+                    className="absolute -bottom-[4px] left-4 sm:left-6 w-16 sm:w-24 h-[2.5px] bg-[#00E5FF] pointer-events-none transition-all duration-300 group-hover:w-24 sm:group-hover:w-32"
+                    style={{ boxShadow: '0 0 10px #00E5FF, 0 0 20px #00E5FF' }}
+                  />
 
-                {/* Minimal Arrow */}
-                <ArrowRight className="w-3.5 h-3.5 text-[#00D9FF] group-hover:text-[#080A0E] transition-all duration-300 group-hover:translate-x-1" />
-              </button>
+                  {/* 4 Diagonal Corner Tick Accents (Parallel to 45° Chamfers) */}
+                  <div
+                    className="absolute -top-[3px] -left-[3px] w-3 h-3 border-t-2 border-l-2 border-[#00E5FF] pointer-events-none"
+                    style={{ boxShadow: '0 0 8px #00E5FF' }}
+                  />
+                  <div
+                    className="absolute -top-[3px] -right-[3px] w-3 h-3 border-t-2 border-r-2 border-[#00E5FF] pointer-events-none"
+                    style={{ boxShadow: '0 0 8px #00E5FF' }}
+                  />
+                  <div
+                    className="absolute -bottom-[3px] -left-[3px] w-3 h-3 border-b-2 border-l-2 border-[#00E5FF] pointer-events-none"
+                    style={{ boxShadow: '0 0 8px #00E5FF' }}
+                  />
+                  <div
+                    className="absolute -bottom-[3px] -right-[3px] w-3 h-3 border-b-2 border-r-2 border-[#00E5FF] pointer-events-none"
+                    style={{ boxShadow: '0 0 8px #00E5FF' }}
+                  />
+
+                  {/* Clipped Corner Button Base (1.5px Neon Cyan Border Frame via Padding) */}
+                  <div
+                    className="p-[1.5px] bg-[#00E5FF] transition-all duration-300 group-hover:bg-white"
+                    style={{
+                      clipPath:
+                        'polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px)',
+                      boxShadow:
+                        '0 0 18px rgba(0,229,255,0.7), 0 0 36px rgba(0,229,255,0.35)',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={handleSkip}
+                      className="relative flex items-center justify-between gap-4 sm:gap-6 px-6 sm:px-8 py-3.5 sm:py-4 bg-[#05080E]/90 hover:bg-[#07101B]/90 backdrop-blur-md transition-colors duration-300 cursor-pointer active:scale-[0.99] overflow-hidden"
+                      style={{
+                        clipPath:
+                          'polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px)',
+                      }}
+                    >
+                      {/* Scanning Light Sweep on Hover */}
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-[#00E5FF]/25 to-transparent -translate-x-full group-hover:translate-x-[250%] transition-transform duration-1000 ease-in-out pointer-events-none"
+                      />
+
+                      {/* Left Glowing Cyan Dot */}
+                      <div className="relative flex items-center justify-center shrink-0">
+                        <span
+                          className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#00E5FF] group-hover:bg-white transition-colors duration-300"
+                          style={{
+                            boxShadow:
+                              '0 0 8px #00E5FF, 0 0 16px #00E5FF, 0 0 24px rgba(0,229,255,0.8)',
+                          }}
+                        />
+                      </div>
+
+                      {/* Uppercase Monospaced Text */}
+                      <span
+                        className="font-mono-tech font-bold text-xs sm:text-sm tracking-[0.16em] sm:tracking-[0.22em] text-[#00E5FF] group-hover:text-white transition-colors duration-300 whitespace-nowrap"
+                        style={{
+                          textShadow:
+                            '0 0 10px rgba(0,229,255,0.8), 0 0 20px rgba(0,229,255,0.4)',
+                        }}
+                      >
+                        INITIALIZE EXPERIENCE
+                      </span>
+
+                      {/* Right Arrow */}
+                      <div className="shrink-0 flex items-center text-[#00E5FF] group-hover:text-white transition-all duration-300 group-hover:translate-x-1.5">
+                        <ArrowRight
+                          className="w-4 h-4 sm:w-4.5 sm:h-4.5"
+                          style={{
+                            filter: 'drop-shadow(0 0 8px #00E5FF)',
+                          }}
+                        />
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         )}
