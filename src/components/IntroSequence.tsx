@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 import { ArrowRight, Sparkles, X } from 'lucide-react';
 
 interface IntroSequenceProps {
@@ -8,7 +9,7 @@ interface IntroSequenceProps {
 /* ─── Character set for kinetic scramble morph ─── */
 const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 
-/* ─── Boot sequence telemetry lines (paced for 1.3s) ─── */
+/* ─── Boot sequence telemetry lines (strictly calibrated to 1.3s) ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
   { text: '> JAYAKRISHNA® OS v3.0.1', delay: 220 },
@@ -16,7 +17,7 @@ const BOOT_LINES = [
   { text: '> RENDER PIPELINE — READY', delay: 750 },
 ];
 
-/* ─── Letters for rollout from tilted exclamation ─── */
+/* ─── Letters of the name ─── */
 const NAME_LETTERS = 'JAYAKRISHNA'.split('');
 
 /* ─── Side telemetry data for portfolio stage ─── */
@@ -34,11 +35,10 @@ const RIGHT_TELEMETRY = [
   'NET: STABLE',
 ];
 
-/* ─── Choreographed animation stages ─── */
+/* ─── Stages ─── */
 type Stage =
   | 'boot'
-  | 'exclamation-drop'
-  | 'exclamation-tilt'
+  | 'exclamation'
   | 'name-settle'
   | 'morph'
   | 'portfolio'
@@ -47,15 +47,21 @@ type Stage =
 export function IntroSequence({ onComplete }: IntroSequenceProps) {
   const [stage, setStage] = useState<Stage>('boot');
   const [bootLineIdx, setBootLineIdx] = useState(-1);
-  const [visibleLettersCount, setVisibleLettersCount] = useState(0);
   const [displayText, setDisplayText] = useState('JAYAKRISHNA');
   const [morphLocked, setMorphLocked] = useState<boolean[]>([]);
   const [showEnter, setShowEnter] = useState(false);
   const [showSideTelemetry, setShowSideTelemetry] = useState(false);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<Stage>('boot');
   const skippedRef = useRef(false);
+
+  // GSAP animation refs for the exclamation turn & tumbling unroll
+  const animContainerRef = useRef<HTMLDivElement | null>(null);
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const dotRef = useRef<HTMLDivElement | null>(null);
+  const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
 
   // Keep stageRef in sync for canvas animation
   useEffect(() => {
@@ -89,54 +95,119 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
     // Trigger exclamation drop at exactly 1.3s
-    timers.push(setTimeout(() => setStage('exclamation-drop'), 1300));
+    timers.push(setTimeout(() => setStage('exclamation'), 1300));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2: Exclamation Bar Drops onto Dot (1.3 – 1.9s)
+     PHASE 2 & 3: EXCLAMATION DROP → PIVOT TILT → 3D TUMBLING UNROLL
+     Recreated with GSAP 3D physics from the reference video!
      ═══════════════════════════════════════════════ */
   useEffect(() => {
-    if (stage !== 'exclamation-drop') return;
-    // Holds the completed exclamation mark for ~600ms, then starts the pivot tilt
-    const t = setTimeout(() => setStage('exclamation-tilt'), 600);
-    return () => clearTimeout(t);
-  }, [stage]);
+    if (stage !== 'exclamation') return;
 
-  /* ═══════════════════════════════════════════════
-     PHASE 3: Exclamation Tilts & Letters Unroll (1.9 – 2.9s)
-     The bar tilts -65deg on the dot, and J-A-Y-A-K-R-I-S-H-N-A springs out!
-     ═══════════════════════════════════════════════ */
-  useEffect(() => {
-    if (stage !== 'exclamation-tilt') return;
-    const interval = 65; // ms per letter rollout
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    const bar = barRef.current;
+    const dot = dotRef.current;
+    const letters = lettersRef.current.filter(Boolean) as HTMLSpanElement[];
 
-    // Delay slightly so the bar begins tilting before letters cascade out
-    const startDelay = 180;
-    for (let i = 1; i <= NAME_LETTERS.length; i++) {
-      timers.push(
-        setTimeout(() => {
-          setVisibleLettersCount(i);
-        }, startDelay + i * interval)
+    if (!bar || !dot || letters.length === 0) return;
+
+    // Reset initial states
+    gsap.set(dot, { scale: 0, opacity: 0 });
+    gsap.set(bar, { y: -120, scaleY: 1.4, opacity: 0, rotation: 0, transformOrigin: 'bottom center' });
+    gsap.set(letters, {
+      opacity: 0,
+      rotationZ: -55,
+      rotationX: 75,
+      y: -35,
+      x: (i) => -25 + i * 2,
+      scale: 0.7,
+      transformOrigin: 'bottom left',
+    });
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        setDisplayText('JAYAKRISHNA');
+        setStage('name-settle');
+      },
+    });
+
+    // 1. Dot pops in center with pulse
+    tl.to(dot, {
+      scale: 1,
+      opacity: 1,
+      duration: 0.25,
+      ease: 'back.out(2)',
+    })
+      // 2. Bar drops from above onto the dot
+      .to(
+        bar,
+        {
+          y: 0,
+          scaleY: 1,
+          opacity: 1,
+          duration: 0.38,
+          ease: 'power3.in',
+        },
+        '+=0.05'
+      )
+      // Slight bounce on impact
+      .to(bar, {
+        y: -6,
+        duration: 0.1,
+        ease: 'power1.out',
+      })
+      .to(bar, {
+        y: 0,
+        duration: 0.1,
+        ease: 'power1.in',
+      })
+      // 3. Holds as completed "!" for a beat, then tilts counter-clockwise like a lever (-58°)
+      .to(
+        bar,
+        {
+          rotation: -58,
+          duration: 0.42,
+          ease: 'power2.inOut',
+        },
+        '+=0.18'
+      )
+      // 4. As the bar tilts, the letters tumble out in a 3D domino cascade onto the baseline!
+      .to(
+        letters,
+        {
+          opacity: 1,
+          rotationZ: 0,
+          rotationX: 0,
+          y: 0,
+          x: 0,
+          scale: 1,
+          stagger: 0.055,
+          duration: 0.48,
+          ease: 'back.out(2.2)',
+        },
+        '-=0.25'
+      )
+      // 5. Exclamation stick and dot dissolve smoothly as the full word JAYAKRISHNA locks in
+      .to(
+        [bar, dot],
+        {
+          opacity: 0,
+          scale: 0.6,
+          duration: 0.28,
+          ease: 'power2.out',
+        },
+        '-=0.15'
       );
-    }
-
-    // After all letters roll out, transition to name-settle
-    const endTimer = setTimeout(() => {
-      setDisplayText('JAYAKRISHNA');
-      setStage('name-settle');
-    }, startDelay + NAME_LETTERS.length * interval + 250);
 
     return () => {
-      timers.forEach(clearTimeout);
-      clearTimeout(endTimer);
+      tl.kill();
     };
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 4: Name Settle & Chromatic Hold (2.9 – 3.9s)
-     JAYAKRISHNA shines in center for ~1s before morph
+     PHASE 4: Name Settle & Chromatic Hold (~1.0s)
+     JAYAKRISHNA holds centered before morphing
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'name-settle') return;
@@ -268,8 +339,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       const currentStage = stageRef.current;
 
       let speedMul = 1;
-      if (currentStage === 'exclamation-drop') speedMul = 2.5;
-      else if (currentStage === 'exclamation-tilt') speedMul = 3.5;
+      if (currentStage === 'exclamation') speedMul = 2.5;
       else if (currentStage === 'name-settle') speedMul = 1.8;
       else if (currentStage === 'morph') speedMul = 3;
       else if (currentStage === 'portfolio') speedMul = 0.6;
@@ -480,71 +550,65 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         )}
 
         {/* ══════════════════════════════════════════════════════════
-             PHASE 2 & 3: EXCLAMATION DROP → TILT → NAME ROLLOUT
-             (Exact recreation of reference video physics!)
+             PHASE 2 & 3: EXCLAMATION DROP → PIVOT TILT → 3D UNROLL
+             (Exact 3D physics from reference video)
              ══════════════════════════════════════════════════════════ */}
-        {(stage === 'exclamation-drop' || stage === 'exclamation-tilt') && (
-          <div className="relative flex items-center justify-center min-h-[140px]">
-            {/* The Dot: Anchored at baseline */}
-            <div className="relative flex items-center justify-center">
+        {stage === 'exclamation' && (
+          <div
+            ref={animContainerRef}
+            className="relative flex items-center justify-center min-h-[140px] w-full"
+            style={{ perspective: '1200px' }}
+          >
+            {/* The Exclamation Mark Assembly (Bar + Dot) */}
+            <div className="relative flex flex-col items-center justify-center">
+              {/* Tilted / Dropping Exclamation Stick */}
               <div
-                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white transition-transform duration-300"
-                style={{
-                  boxShadow:
-                    '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.8), 0 0 60px rgba(0,217,255,0.4)',
-                }}
-              />
-              <div
-                className="absolute w-8 h-8 rounded-full border border-[#00D9FF]/60 animate-ping pointer-events-none"
-                style={{ animationDuration: '1.2s' }}
-              />
-
-              {/* The Vertical Bar of "!": Drops onto dot, then tilts -65deg around the dot */}
-              <div
-                className={`absolute bottom-6 sm:bottom-7 left-1/2 -translate-x-1/2 w-3.5 sm:w-4 h-16 sm:h-20 rounded-t-sm transition-all duration-500 ease-out ${
-                  stage === 'exclamation-drop'
-                    ? 'animate-exclamation-drop'
-                    : ''
-                }`}
+                ref={barRef}
+                className="w-4 sm:w-5 h-16 sm:h-20 rounded-t-sm mb-2.5"
                 style={{
                   background:
-                    'linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 40%, #38BDF8 75%, #00D9FF 100%)',
-                  boxShadow: '0 0 25px rgba(0,217,255,0.8), 0 0 50px rgba(0,217,255,0.4)',
-                  transformOrigin: 'bottom center',
-                  transform:
-                    stage === 'exclamation-tilt'
-                      ? 'translate(-50%, 0) rotate(-65deg)'
-                      : 'translate(-50%, 0) rotate(0deg)',
+                    'linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 35%, #94A3B8 70%, #64748B 100%)',
+                  boxShadow:
+                    '0 0 25px rgba(0,217,255,0.7), 0 0 50px rgba(0,217,255,0.3)',
+                }}
+              />
+
+              {/* Baseline Dot */}
+              <div
+                ref={dotRef}
+                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white"
+                style={{
+                  boxShadow:
+                    '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.8)',
                 }}
               />
             </div>
 
-            {/* The Name Letters Unrolling / Springing Out from the Tilted Bar */}
-            {stage === 'exclamation-tilt' && (
-              <div className="absolute left-[54%] top-1/2 -translate-y-1/2 flex items-center font-display font-black text-[clamp(2.4rem,8vw,5.5rem)] leading-none uppercase tracking-[0.06em] whitespace-nowrap">
-                {NAME_LETTERS.map((letter, idx) => {
-                  const isVisible = idx < visibleLettersCount;
-                  return (
-                    <span
-                      key={idx}
-                      className="inline-block transition-all duration-300 ease-out"
-                      style={{
-                        opacity: isVisible ? 1 : 0,
-                        transform: isVisible
-                          ? 'translateX(0) scale(1) rotate(0deg)'
-                          : 'translateX(-30px) scale(0.6) rotate(-25deg)',
-                        color: '#FFFFFF',
-                        textShadow:
-                          '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.6)',
-                        filter: isVisible ? 'none' : 'blur(8px)',
-                      }}
-                    >
-                      {letter}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
+            {/* The 11 Letters Unrolling in 3D Domino Waves */}
+            <div
+              className="absolute flex items-center justify-center font-display font-black text-[clamp(2.4rem,8vw,5.5rem)] leading-none uppercase tracking-[0.06em] whitespace-nowrap"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {NAME_LETTERS.map((letter, idx) => (
+                <span
+                  key={idx}
+                  ref={(el) => {
+                    lettersRef.current[idx] = el;
+                  }}
+                  className="inline-block relative"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, #FFFFFF 15%, #E2E8F0 45%, #94A3B8 80%, #64748B 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    filter:
+                      'drop-shadow(0 4px 10px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,217,255,0.35))',
+                  }}
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
@@ -567,7 +631,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 letterSpacing: '0.06em',
               }}
             >
-              {/* Subtle Chromatic Aberration during name-settle */}
+              {/* Subtle Chromatic Glitch during name-settle */}
               {stage === 'name-settle' && (
                 <>
                   <span
