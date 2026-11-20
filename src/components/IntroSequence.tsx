@@ -6,19 +6,17 @@ interface IntroSequenceProps {
   onComplete: () => void;
 }
 
-/* ─── Character set for kinetic scramble morph ─── */
-const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
-
-/* ─── Boot sequence telemetry lines (strictly calibrated to 1.3s) ─── */
+/* ─── Boot telemetry lines (paced strictly for 1.3s) ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 220 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 480 },
-  { text: '> RENDER PIPELINE — READY', delay: 750 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 240 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 520 },
+  { text: '> RENDER PIPELINE — READY', delay: 820 },
 ];
 
-/* ─── Letters of the name ─── */
-const NAME_LETTERS = 'JAYAKRISHNA'.split('');
+/* ─── Morph sequence: JAYAKRISHNA (11) -> PORTFOLIO (9) ─── */
+const INITIAL_WORD = 'JAYAKRISHNA'.split('');
+const TARGET_WORD = 'PORTFOLIO'.split('');
 
 /* ─── Side telemetry data for portfolio stage ─── */
 const LEFT_TELEMETRY = [
@@ -35,45 +33,31 @@ const RIGHT_TELEMETRY = [
   'NET: STABLE',
 ];
 
-/* ─── Stages ─── */
-type Stage =
-  | 'boot'
-  | 'exclamation'
-  | 'name-settle'
-  | 'morph'
-  | 'portfolio'
-  | 'exit';
-
 export function IntroSequence({ onComplete }: IntroSequenceProps) {
-  const [stage, setStage] = useState<Stage>('boot');
+  // Master stages: 'boot' -> 'exclamation' -> 'unroll' -> 'name-hold' -> 'morph' -> 'portfolio' -> 'exit'
+  const [stage, setStage] = useState<'boot' | 'animating' | 'portfolio' | 'exit'>('boot');
   const [bootLineIdx, setBootLineIdx] = useState(-1);
-  const [displayText, setDisplayText] = useState('JAYAKRISHNA');
-  const [morphLocked, setMorphLocked] = useState<boolean[]>([]);
+  const [currentLetters, setCurrentLetters] = useState<string[]>(INITIAL_WORD);
   const [showEnter, setShowEnter] = useState(false);
   const [showSideTelemetry, setShowSideTelemetry] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const stageRef = useRef<Stage>('boot');
   const skippedRef = useRef(false);
 
-  // GSAP animation refs for the exclamation turn & tumbling unroll
-  const animContainerRef = useRef<HTMLDivElement | null>(null);
-  const barRef = useRef<HTMLDivElement | null>(null);
+  // GSAP animation targets
+  const assemblyRef = useRef<HTMLDivElement | null>(null);
   const dotRef = useRef<HTMLDivElement | null>(null);
-  const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const barRef = useRef<HTMLDivElement | null>(null);
+  const lettersWrapperRef = useRef<HTMLDivElement | null>(null);
+  const letterSpanRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  // Keep stageRef in sync for canvas animation
-  useEffect(() => {
-    stageRef.current = stage;
-  }, [stage]);
-
-  /* ─── Skip handler ─── */
+  /* ─── Skip Handler ─── */
   const handleSkip = useCallback(() => {
     if (skippedRef.current) return;
     skippedRef.current = true;
     setStage('exit');
-    setTimeout(() => onComplete(), 700);
+    setTimeout(() => onComplete(), 600);
   }, [onComplete]);
 
   /* ESC key listener */
@@ -94,194 +78,175 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    // Trigger exclamation drop at exactly 1.3s
-    timers.push(setTimeout(() => setStage('exclamation'), 1300));
+    // Trigger the kinetic 3D sequence at exactly 1.3s
+    timers.push(
+      setTimeout(() => {
+        setStage('animating');
+      }, 1300)
+    );
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2 & 3: EXCLAMATION DROP → PIVOT TILT → 3D TUMBLING UNROLL
-     Recreated with GSAP 3D physics from the reference video!
+     PHASE 2, 3, 4 & 5: MASTER GSAP TIMELINE
+     1. Dot pops
+     2. Bar drops from above onto dot to form "!"
+     3. Bar tilts -62deg on the dot like a lever
+     4. JAYAKRISHNA letters tumble out in a 3D domino wave
+     5. Name holds in chrome luster for 1.0s
+     6. Progressive 3D split-flap flip to PORTFOLIO
+     7. Heroic UI & portrait reveal
      ═══════════════════════════════════════════════ */
   useEffect(() => {
-    if (stage !== 'exclamation') return;
+    if (stage !== 'animating') return;
 
-    const bar = barRef.current;
     const dot = dotRef.current;
-    const letters = lettersRef.current.filter(Boolean) as HTMLSpanElement[];
+    const bar = barRef.current;
+    const assembly = assemblyRef.current;
+    const letters = letterSpanRefs.current.filter(Boolean) as HTMLSpanElement[];
 
-    if (!bar || !dot || letters.length === 0) return;
+    if (!dot || !bar || !assembly || letters.length === 0) return;
 
-    // Reset initial states
+    // Initial setup
     gsap.set(dot, { scale: 0, opacity: 0 });
-    gsap.set(bar, { y: -120, scaleY: 1.4, opacity: 0, rotation: 0, transformOrigin: 'bottom center' });
+    gsap.set(bar, { y: -130, scaleY: 1.4, opacity: 0, rotation: 0, transformOrigin: 'bottom center' });
     gsap.set(letters, {
       opacity: 0,
-      rotationZ: -55,
-      rotationX: 75,
-      y: -35,
-      x: (i) => -25 + i * 2,
-      scale: 0.7,
+      rotationZ: -58,
+      rotationX: 80,
+      y: -40,
+      x: -30,
+      scale: 0.6,
       transformOrigin: 'bottom left',
     });
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        setDisplayText('JAYAKRISHNA');
-        setStage('name-settle');
-      },
-    });
+    const masterTl = gsap.timeline();
 
-    // 1. Dot pops in center with pulse
-    tl.to(dot, {
+    // ── 1. Dot pops in center with pulse ──
+    masterTl.to(dot, {
       scale: 1,
       opacity: 1,
-      duration: 0.25,
+      duration: 0.22,
       ease: 'back.out(2)',
     })
-      // 2. Bar drops from above onto the dot
-      .to(
-        bar,
-        {
-          y: 0,
-          scaleY: 1,
-          opacity: 1,
-          duration: 0.38,
-          ease: 'power3.in',
-        },
-        '+=0.05'
-      )
-      // Slight bounce on impact
-      .to(bar, {
-        y: -6,
-        duration: 0.1,
-        ease: 'power1.out',
-      })
-      .to(bar, {
+
+    // ── 2. Bar drops onto dot with elastic momentum ──
+    .to(
+      bar,
+      {
         y: 0,
-        duration: 0.1,
-        ease: 'power1.in',
-      })
-      // 3. Holds as completed "!" for a beat, then tilts counter-clockwise like a lever (-58°)
-      .to(
-        bar,
-        {
-          rotation: -58,
-          duration: 0.42,
-          ease: 'power2.inOut',
-        },
-        '+=0.18'
-      )
-      // 4. As the bar tilts, the letters tumble out in a 3D domino cascade onto the baseline!
-      .to(
-        letters,
-        {
-          opacity: 1,
-          rotationZ: 0,
-          rotationX: 0,
-          y: 0,
-          x: 0,
-          scale: 1,
-          stagger: 0.055,
-          duration: 0.48,
-          ease: 'back.out(2.2)',
-        },
-        '-=0.25'
-      )
-      // 5. Exclamation stick and dot dissolve smoothly as the full word JAYAKRISHNA locks in
-      .to(
-        [bar, dot],
-        {
-          opacity: 0,
-          scale: 0.6,
-          duration: 0.28,
-          ease: 'power2.out',
-        },
-        '-=0.15'
-      );
+        scaleY: 1,
+        opacity: 1,
+        duration: 0.35,
+        ease: 'power3.in',
+      },
+      '+=0.04'
+    )
+    .to(bar, { y: -5, duration: 0.08, ease: 'power1.out' })
+    .to(bar, { y: 0, duration: 0.08, ease: 'power1.in' })
+
+    // ── 3. Bar tilts counter-clockwise like a mechanical lever (-62deg) ──
+    .to(
+      bar,
+      {
+        rotation: -62,
+        duration: 0.38,
+        ease: 'power2.inOut',
+      },
+      '+=0.15'
+    )
+
+    // ── 4. Letters tumble out in a 3D domino wave along the tilted plane ──
+    .to(
+      letters,
+      {
+        opacity: 1,
+        rotationZ: 0,
+        rotationX: 0,
+        y: 0,
+        x: 0,
+        scale: 1,
+        stagger: 0.045,
+        duration: 0.45,
+        ease: 'back.out(2.4)',
+      },
+      '-=0.22'
+    )
+
+    // ── 5. Exclamation stick and dot dissolve as JAYAKRISHNA locks in ──
+    .to(
+      assembly,
+      {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.25,
+        ease: 'power2.out',
+      },
+      '-=0.15'
+    )
+
+    // ── 6. Name holds in liquid-chrome center for ~1.0 second ──
+    .to({}, { duration: 0.9 })
+
+    // ── 7. Progressive 3D Split-Flap Morph from JAYAKRISHNA to PORTFOLIO ──
+    .call(() => {
+      // Step-by-step split-flap replacement across the 9 letters
+      TARGET_WORD.forEach((targetChar, i) => {
+        const span = letters[i];
+        if (!span) return;
+
+        // Flip up and replace
+        gsap.to(span, {
+          rotationX: -90,
+          opacity: 0.3,
+          duration: 0.16,
+          delay: i * 0.08,
+          ease: 'power1.in',
+          onComplete: () => {
+            span.textContent = targetChar;
+            gsap.fromTo(
+              span,
+              { rotationX: 90, opacity: 0.3 },
+              {
+                rotationX: 0,
+                opacity: 1,
+                duration: 0.22,
+                ease: 'back.out(1.8)',
+              }
+            );
+          },
+        });
+      });
+
+      // Collapse the remaining 2 trailing letters (N, A)
+      const trailing = [letters[9], letters[10]];
+      gsap.to(trailing, {
+        opacity: 0,
+        scale: 0,
+        width: 0,
+        margin: 0,
+        duration: 0.25,
+        delay: 0.45,
+        ease: 'power2.in',
+      });
+    })
+
+    // ── 8. Transition to Portfolio Stage (Heroic Reveal) ──
+    .to({}, { duration: 1.3 })
+    .call(() => {
+      setCurrentLetters(TARGET_WORD);
+      setStage('portfolio');
+      setShowSideTelemetry(true);
+      setTimeout(() => setShowEnter(true), 400);
+    });
 
     return () => {
-      tl.kill();
+      masterTl.kill();
     };
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 4: Name Settle & Chromatic Hold (~1.0s)
-     JAYAKRISHNA holds centered before morphing
-     ═══════════════════════════════════════════════ */
-  useEffect(() => {
-    if (stage !== 'name-settle') return;
-    const t = setTimeout(() => setStage('morph'), 1000);
-    return () => clearTimeout(t);
-  }, [stage]);
-
-  /* ═══════════════════════════════════════════════
-     PHASE 5: Kinetic Scramble Morph JAYAKRISHNA → PORTFOLIO
-     ═══════════════════════════════════════════════ */
-  useEffect(() => {
-    if (stage !== 'morph') return;
-
-    const target = 'PORTFOLIO';
-    const startWord = 'JAYAKRISHNA';
-    const duration = 2000;
-    const startTime = performance.now();
-    setMorphLocked(new Array(target.length).fill(false));
-
-    let frameId: number;
-
-    const tick = (now: number) => {
-      if (skippedRef.current) return;
-      const elapsed = now - startTime;
-      const progress = Math.min(1, elapsed / duration);
-
-      if (progress < 1) {
-        const currentLen = Math.round(
-          startWord.length - (startWord.length - target.length) * progress
-        );
-        let morphed = '';
-        const newLocked = new Array(target.length).fill(false);
-
-        for (let i = 0; i < currentLen; i++) {
-          const lockThreshold = (i + 1) / (target.length + 1);
-          if (i < target.length && progress > lockThreshold) {
-            morphed += target[i];
-            newLocked[i] = true;
-          } else {
-            morphed += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-          }
-        }
-
-        setDisplayText(morphed);
-        setMorphLocked(newLocked);
-        frameId = requestAnimationFrame(tick);
-      } else {
-        setDisplayText('PORTFOLIO');
-        setMorphLocked(new Array(target.length).fill(true));
-        setStage('portfolio');
-      }
-    };
-
-    frameId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frameId);
-  }, [stage]);
-
-  /* ═══════════════════════════════════════════════
-     PHASE 6: Portfolio Stage — Heroic UI Emergence
-     (Waits exclusively for user click on "Enter Studio")
-     ═══════════════════════════════════════════════ */
-  useEffect(() => {
-    if (stage !== 'portfolio') return;
-    const t1 = setTimeout(() => setShowSideTelemetry(true), 350);
-    const t2 = setTimeout(() => setShowEnter(true), 600);
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [stage]);
-
-  /* ═══════════════════════════════════════════════
-     BACKGROUND: Particle Starfield
+     BACKGROUND: Starfield Particles
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -299,7 +264,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     };
     window.addEventListener('resize', onResize);
 
-    const PARTICLE_COUNT = 380;
+    const PARTICLE_COUNT = 320;
 
     interface Particle {
       x: number;
@@ -319,10 +284,10 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         x: (Math.random() - 0.5) * width * 2,
         y: (Math.random() - 0.5) * height * 2,
         z: Math.random() * width,
-        speed: 1.5 + Math.random() * 4,
-        size: 0.6 + Math.random() * 1.8,
-        color: Math.random() > 0.35 ? '#00D9FF' : '#FFFFFF',
-        alpha: 0.15 + Math.random() * 0.85,
+        speed: 1.2 + Math.random() * 3,
+        size: 0.6 + Math.random() * 1.6,
+        color: Math.random() > 0.4 ? '#00D9FF' : '#FFFFFF',
+        alpha: 0.15 + Math.random() * 0.8,
         prevX: 0,
         prevY: 0,
       });
@@ -331,19 +296,16 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     let animationId: number;
 
     const render = () => {
-      ctx.fillStyle = 'rgba(8, 10, 14, 0.2)';
+      ctx.fillStyle = 'rgba(8, 10, 14, 0.22)';
       ctx.fillRect(0, 0, width, height);
 
       const cx = width / 2;
       const cy = height / 2;
-      const currentStage = stageRef.current;
 
       let speedMul = 1;
-      if (currentStage === 'exclamation') speedMul = 2.5;
-      else if (currentStage === 'name-settle') speedMul = 1.8;
-      else if (currentStage === 'morph') speedMul = 3;
-      else if (currentStage === 'portfolio') speedMul = 0.6;
-      else if (currentStage === 'exit') speedMul = 6;
+      if (stage === 'animating') speedMul = 2.2;
+      else if (stage === 'portfolio') speedMul = 0.55;
+      else if (stage === 'exit') speedMul = 6;
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
         const p = particles[i];
@@ -365,15 +327,15 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
         if (px >= -50 && px <= width + 50 && py >= -50 && py <= height + 50) {
           const size = Math.max(0.4, p.size * k2);
-          const alpha = Math.min(1, p.alpha * k2 * 0.6);
+          const alpha = Math.min(1, p.alpha * k2 * 0.55);
 
           if (speedMul > 2) {
             ctx.beginPath();
             ctx.moveTo(p.prevX, p.prevY);
             ctx.lineTo(px, py);
             ctx.strokeStyle = p.color;
-            ctx.globalAlpha = alpha * 0.6;
-            ctx.lineWidth = size * 0.5;
+            ctx.globalAlpha = alpha * 0.5;
+            ctx.lineWidth = size * 0.4;
             ctx.stroke();
           }
 
@@ -395,7 +357,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [stage]);
 
   return (
     <div
@@ -407,16 +369,16 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       }`}
       style={{ background: '#080A0E' }}
     >
-      {/* ── Particle Starfield Canvas ── */}
+      {/* ── Background Particle Canvas ── */}
       <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" />
 
-      {/* ── Background Embedded Portrait (Dark, Moody, Heroic with Studio Cyan Rim Glow) ── */}
+      {/* ── Background Embedded Constellation Portrait (Emerges in Portfolio Stage) ── */}
       <div
         className={`absolute inset-0 pointer-events-none flex items-center justify-center transition-all duration-1000 ease-out z-[1] ${
           stage === 'portfolio' ? 'opacity-85 scale-100' : 'opacity-0 scale-95'
         }`}
       >
-        {/* Subtle Cyan Studio Spot Rim Glow behind head (matches HeroSection) */}
+        {/* Subtle Cyan Studio Rim Spotlight behind head (exact match to HeroSection) */}
         <div
           aria-hidden="true"
           className="absolute -top-12 sm:-top-20 w-[360px] sm:w-[500px] h-[360px] sm:h-[500px] rounded-full opacity-50 blur-3xl pointer-events-none"
@@ -479,50 +441,49 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       </div>
 
       {/* ═══════════════════════════════════════
-           LEFT SIDE TELEMETRY (portfolio stage)
+           SIDE TELEMETRY RAILS (portfolio stage)
            ═══════════════════════════════════════ */}
       {stage === 'portfolio' && (
-        <div
-          className={`absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 hidden lg:flex flex-col gap-3 font-mono-tech text-[9px] tracking-widest transition-all duration-700 ${
-            showSideTelemetry
-              ? 'opacity-100 translate-x-0'
-              : 'opacity-0 -translate-x-6'
-          }`}
-        >
-          <div className="w-5 h-5 border-l border-t border-[#00D9FF]/40" />
-          {LEFT_TELEMETRY.map((line, i) => (
-            <div key={i} className="text-[#64748B] flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-[#00D9FF]/60" />
-              <span>{line}</span>
-            </div>
-          ))}
-          <div className="w-5 h-5 border-l border-b border-[#00D9FF]/40" />
-        </div>
+        <>
+          {/* Left Rail */}
+          <div
+            className={`absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-20 hidden lg:flex flex-col gap-3 font-mono-tech text-[9px] tracking-widest transition-all duration-700 ${
+              showSideTelemetry
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 -translate-x-6'
+            }`}
+          >
+            <div className="w-5 h-5 border-l border-t border-[#00D9FF]/40" />
+            {LEFT_TELEMETRY.map((line, i) => (
+              <div key={i} className="text-[#64748B] flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-[#00D9FF]/60" />
+                <span>{line}</span>
+              </div>
+            ))}
+            <div className="w-5 h-5 border-l border-b border-[#00D9FF]/40" />
+          </div>
+
+          {/* Right Rail */}
+          <div
+            className={`absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 hidden lg:flex flex-col items-end gap-3 font-mono-tech text-[9px] tracking-widest transition-all duration-700 ${
+              showSideTelemetry
+                ? 'opacity-100 translate-x-0'
+                : 'opacity-0 translate-x-6'
+            }`}
+          >
+            <div className="w-5 h-5 border-r border-t border-[#00D9FF]/40 self-end" />
+            {RIGHT_TELEMETRY.map((line, i) => (
+              <div key={i} className="text-[#64748B] flex items-center gap-1.5">
+                <span>{line}</span>
+                <span className="w-1 h-1 rounded-full bg-[#00D9FF]/60" />
+              </div>
+            ))}
+            <div className="w-5 h-5 border-r border-b border-[#00D9FF]/40 self-end" />
+          </div>
+        </>
       )}
 
-      {/* ═══════════════════════════════════════
-           RIGHT SIDE TELEMETRY (portfolio stage)
-           ═══════════════════════════════════════ */}
-      {stage === 'portfolio' && (
-        <div
-          className={`absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-20 hidden lg:flex flex-col items-end gap-3 font-mono-tech text-[9px] tracking-widest transition-all duration-700 ${
-            showSideTelemetry
-              ? 'opacity-100 translate-x-0'
-              : 'opacity-0 translate-x-6'
-          }`}
-        >
-          <div className="w-5 h-5 border-r border-t border-[#00D9FF]/40 self-end" />
-          {RIGHT_TELEMETRY.map((line, i) => (
-            <div key={i} className="text-[#64748B] flex items-center gap-1.5">
-              <span>{line}</span>
-              <span className="w-1 h-1 rounded-full bg-[#00D9FF]/60" />
-            </div>
-          ))}
-          <div className="w-5 h-5 border-r border-b border-[#00D9FF]/40 self-end" />
-        </div>
-      )}
-
-      {/* ── Center Stage ── */}
+      {/* ── Main Center Stage ── */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl">
         {/* PHASE 1: Boot Terminal (1.3s) */}
         {stage === 'boot' && (
@@ -550,26 +511,30 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         )}
 
         {/* ══════════════════════════════════════════════════════════
-             PHASE 2 & 3: EXCLAMATION DROP → PIVOT TILT → 3D UNROLL
-             (Exact 3D physics from reference video)
+             UNIFIED PERSISTENT 3D STAGE
+             (Continuous DOM element: No jumps, pure physical flow)
              ══════════════════════════════════════════════════════════ */}
-        {stage === 'exclamation' && (
+        {(stage === 'animating' || stage === 'portfolio') && (
           <div
-            ref={animContainerRef}
-            className="relative flex items-center justify-center min-h-[140px] w-full"
-            style={{ perspective: '1200px' }}
+            className={`relative flex flex-col items-center justify-center w-full transition-transform duration-700 ${
+              stage === 'portfolio' ? 'pt-24 sm:pt-36 md:pt-40' : 'pt-0'
+            }`}
           >
-            {/* The Exclamation Mark Assembly (Bar + Dot) */}
-            <div className="relative flex flex-col items-center justify-center">
-              {/* Tilted / Dropping Exclamation Stick */}
+            {/* The Exclamation Assembly (Bar + Dot) — Positioned directly at the start of the word */}
+            <div
+              ref={assemblyRef}
+              className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center pointer-events-none z-20"
+              style={{ bottom: '18px' }}
+            >
+              {/* Vertical Dropping & Tilting Bar */}
               <div
                 ref={barRef}
-                className="w-4 sm:w-5 h-16 sm:h-20 rounded-t-sm mb-2.5"
+                className="w-4 sm:w-5 h-16 sm:h-20 rounded-t-sm mb-2"
                 style={{
                   background:
                     'linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 35%, #94A3B8 70%, #64748B 100%)',
                   boxShadow:
-                    '0 0 25px rgba(0,217,255,0.7), 0 0 50px rgba(0,217,255,0.3)',
+                    '0 0 25px rgba(0,217,255,0.8), 0 0 50px rgba(0,217,255,0.4)',
                 }}
               />
 
@@ -584,132 +549,48 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               />
             </div>
 
-            {/* The 11 Letters Unrolling in 3D Domino Waves */}
+            {/* The Unified 3D Letters Container */}
             <div
-              className="absolute flex items-center justify-center font-display font-black text-[clamp(2.4rem,8vw,5.5rem)] leading-none uppercase tracking-[0.06em] whitespace-nowrap"
-              style={{ transformStyle: 'preserve-3d' }}
+              ref={lettersWrapperRef}
+              className="relative flex items-center justify-center font-display font-black uppercase leading-none whitespace-nowrap"
+              style={{
+                fontSize: 'clamp(2.6rem, 11vw, 7.4rem)',
+                letterSpacing: '0.06em',
+                perspective: '1200px',
+                transformStyle: 'preserve-3d',
+              }}
             >
-              {NAME_LETTERS.map((letter, idx) => (
+              {INITIAL_WORD.map((letter, idx) => (
                 <span
                   key={idx}
                   ref={(el) => {
-                    lettersRef.current[idx] = el;
+                    letterSpanRefs.current[idx] = el;
                   }}
-                  className="inline-block relative"
+                  className="inline-block relative will-change-transform"
                   style={{
                     background:
                       'linear-gradient(180deg, #FFFFFF 15%, #E2E8F0 45%, #94A3B8 80%, #64748B 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     filter:
-                      'drop-shadow(0 4px 10px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(0,217,255,0.35))',
+                      'drop-shadow(0 4px 12px rgba(0,0,0,0.8)) drop-shadow(0 0 25px rgba(0,217,255,0.4))',
+                    transformStyle: 'preserve-3d',
                   }}
                 >
                   {letter}
                 </span>
               ))}
-            </div>
-          </div>
-        )}
 
-        {/* ══════════════════════════════════════════════════════════
-             PHASE 4–6: NAME SETTLE → MORPH → HEROIC PORTFOLIO
-             ══════════════════════════════════════════════════════════ */}
-        {(stage === 'name-settle' || stage === 'morph' || stage === 'portfolio') && (
-          <div
-            className={`relative flex flex-col items-center justify-center w-full z-10 transition-transform duration-700 ${
-              stage === 'portfolio'
-                ? 'pt-24 sm:pt-36 md:pt-40'
-                : 'pt-0'
-            }`}
-          >
-            {/* ── Main Title with Glitch / Morph ── */}
-            <h1
-              className="font-display font-black uppercase leading-none whitespace-nowrap relative"
-              style={{
-                fontSize: 'clamp(2.6rem, 11vw, 7.6rem)',
-                letterSpacing: '0.06em',
-              }}
-            >
-              {/* Subtle Chromatic Glitch during name-settle */}
-              {stage === 'name-settle' && (
-                <>
-                  <span
-                    className="absolute inset-0 chrome-text pointer-events-none"
-                    style={{
-                      color: 'transparent',
-                      clipPath: 'polygon(0 0, 100% 0, 100% 33%, 0 33%)',
-                      transform: 'translate(2px, -1px)',
-                      opacity: 0.6,
-                      filter: 'hue-rotate(-40deg)',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {displayText}
-                  </span>
-                  <span
-                    className="absolute inset-0 chrome-text pointer-events-none"
-                    style={{
-                      color: 'transparent',
-                      clipPath: 'polygon(0 67%, 100% 67%, 100% 100%, 0 100%)',
-                      transform: 'translate(-2px, 1px)',
-                      opacity: 0.6,
-                      filter: 'hue-rotate(40deg)',
-                    }}
-                    aria-hidden="true"
-                  >
-                    {displayText}
-                  </span>
-                </>
-              )}
-
-              {/* Character-by-character lock during kinetic morph */}
-              {stage === 'morph' ? (
-                <span className="relative inline-flex">
-                  {displayText.split('').map((char, i) => (
-                    <span
-                      key={i}
-                      className="inline-block transition-colors duration-100"
-                      style={{
-                        color: morphLocked[i]
-                          ? '#00D9FF'
-                          : 'rgba(255,255,255,0.75)',
-                        textShadow: morphLocked[i]
-                          ? '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.5)'
-                          : '0 0 10px rgba(255,255,255,0.3)',
-                        transform: morphLocked[i]
-                          ? 'scale(1)'
-                          : `translateY(${Math.random() * 2 - 1}px)`,
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </span>
-              ) : (
-                <span
-                  className="chrome-text tracking-[0.06em]"
-                  style={{
-                    filter:
-                      stage === 'name-settle'
-                        ? 'drop-shadow(0 0 50px rgba(0,217,255,0.5))'
-                        : 'drop-shadow(0 0 40px rgba(0,217,255,0.4))',
-                  }}
-                >
-                  {displayText}
-                </span>
-              )}
-
-              {/* Cyan period dot */}
+              {/* Cyan period dot for PORTFOLIO. */}
               {stage === 'portfolio' && (
                 <span
-                  className="text-[#00D9FF]"
-                  style={{ textShadow: '0 0 20px #00D9FF' }}
+                  className="text-[#00D9FF] ml-0.5 animate-fade-in-up"
+                  style={{ textShadow: '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.6)' }}
                 >
                   .
                 </span>
               )}
-            </h1>
+            </div>
 
             {/* ── Glowing Heroic Cyan Divider Line ── */}
             {stage === 'portfolio' && (
@@ -727,7 +608,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                  ULTRA-STYLISH, ATTRACTIVE "ENTER STUDIO" BUTTON
                  ══════════════════════════════════════════════════════════ */}
             {showEnter && stage === 'portfolio' && (
-              <div className="relative group animate-fade-in-up">
+              <div className="relative group animate-fade-in-up mt-1">
                 {/* Exterior Cyan Ambient Aura */}
                 <div
                   aria-hidden="true"
