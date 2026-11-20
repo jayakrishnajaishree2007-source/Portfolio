@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, Sparkles, X } from 'lucide-react';
 
 interface IntroSequenceProps {
   onComplete: () => void;
@@ -8,13 +8,16 @@ interface IntroSequenceProps {
 /* ─── Character set for kinetic scramble morph ─── */
 const GLYPHS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*<>/?█▓▒░';
 
-/* ─── Boot sequence telemetry lines ─── */
+/* ─── Boot sequence telemetry lines (paced for 1.3s) ─── */
 const BOOT_LINES = [
   { text: '> SYSTEM BOOT ... OK', delay: 0 },
-  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 250 },
-  { text: '> COIMBATORE NODE — ACTIVE', delay: 550 },
-  { text: '> RENDER PIPELINE — READY', delay: 850 },
+  { text: '> JAYAKRISHNA® OS v3.0.1', delay: 220 },
+  { text: '> COIMBATORE NODE — ACTIVE', delay: 480 },
+  { text: '> RENDER PIPELINE — READY', delay: 750 },
 ];
+
+/* ─── Letters for rollout from tilted exclamation ─── */
+const NAME_LETTERS = 'JAYAKRISHNA'.split('');
 
 /* ─── Side telemetry data for portfolio stage ─── */
 const LEFT_TELEMETRY = [
@@ -31,21 +34,21 @@ const RIGHT_TELEMETRY = [
   'NET: STABLE',
 ];
 
-/* ─── Stage type ─── */
+/* ─── Choreographed animation stages ─── */
 type Stage =
   | 'boot'
-  | 'exclamation'
-  | 'flash'
-  | 'name-glitch'
-  | 'name-hold'
+  | 'exclamation-drop'
+  | 'exclamation-tilt'
+  | 'name-settle'
   | 'morph'
   | 'portfolio'
   | 'exit';
 
 export function IntroSequence({ onComplete }: IntroSequenceProps) {
   const [stage, setStage] = useState<Stage>('boot');
-  const [displayText, setDisplayText] = useState('');
   const [bootLineIdx, setBootLineIdx] = useState(-1);
+  const [visibleLettersCount, setVisibleLettersCount] = useState(0);
+  const [displayText, setDisplayText] = useState('JAYAKRISHNA');
   const [morphLocked, setMorphLocked] = useState<boolean[]>([]);
   const [showEnter, setShowEnter] = useState(false);
   const [showSideTelemetry, setShowSideTelemetry] = useState(false);
@@ -77,7 +80,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [handleSkip]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 1: Boot Sequence (0 – 1.5s)
+     PHASE 1: Boot Sequence (0 – 1.3s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'boot') return;
@@ -85,49 +88,64 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     BOOT_LINES.forEach((line, idx) => {
       timers.push(setTimeout(() => setBootLineIdx(idx), line.delay));
     });
-    // Trigger exclamation pop at 1.5s
-    timers.push(setTimeout(() => setStage('exclamation'), 1500));
+    // Trigger exclamation drop at exactly 1.3s
+    timers.push(setTimeout(() => setStage('exclamation-drop'), 1300));
     return () => timers.forEach(clearTimeout);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2: Exclamation Mark Pop (!) (1.1 – 2.0s)
-     Pops in center with kinetic spring & shockwaves
+     PHASE 2: Exclamation Bar Drops onto Dot (1.3 – 1.9s)
      ═══════════════════════════════════════════════ */
   useEffect(() => {
-    if (stage !== 'exclamation') return;
-    const t = setTimeout(() => setStage('flash'), 950);
+    if (stage !== 'exclamation-drop') return;
+    // Holds the completed exclamation mark for ~600ms, then starts the pivot tilt
+    const t = setTimeout(() => setStage('exclamation-tilt'), 600);
     return () => clearTimeout(t);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 2b: Flash Frame on impact (2.0 – 2.25s)
+     PHASE 3: Exclamation Tilts & Letters Unroll (1.9 – 2.9s)
+     The bar tilts -65deg on the dot, and J-A-Y-A-K-R-I-S-H-N-A springs out!
      ═══════════════════════════════════════════════ */
   useEffect(() => {
-    if (stage !== 'flash') return;
-    const t = setTimeout(() => setStage('name-glitch'), 220);
+    if (stage !== 'exclamation-tilt') return;
+    const interval = 65; // ms per letter rollout
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    // Delay slightly so the bar begins tilting before letters cascade out
+    const startDelay = 180;
+    for (let i = 1; i <= NAME_LETTERS.length; i++) {
+      timers.push(
+        setTimeout(() => {
+          setVisibleLettersCount(i);
+        }, startDelay + i * interval)
+      );
+    }
+
+    // After all letters roll out, transition to name-settle
+    const endTimer = setTimeout(() => {
+      setDisplayText('JAYAKRISHNA');
+      setStage('name-settle');
+    }, startDelay + NAME_LETTERS.length * interval + 250);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(endTimer);
+    };
+  }, [stage]);
+
+  /* ═══════════════════════════════════════════════
+     PHASE 4: Name Settle & Chromatic Hold (2.9 – 3.9s)
+     JAYAKRISHNA shines in center for ~1s before morph
+     ═══════════════════════════════════════════════ */
+  useEffect(() => {
+    if (stage !== 'name-settle') return;
+    const t = setTimeout(() => setStage('morph'), 1000);
     return () => clearTimeout(t);
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 3: Name Burst with Glitch (2.25 – 3.4s)
-     "JAYAKRISHNA" appears where "!" popped
-     ═══════════════════════════════════════════════ */
-  useEffect(() => {
-    if (stage !== 'name-glitch') return;
-    setDisplayText('JAYAKRISHNA');
-    const t1 = setTimeout(() => setStage('name-hold'), 1100);
-    return () => clearTimeout(t1);
-  }, [stage]);
-
-  useEffect(() => {
-    if (stage !== 'name-hold') return;
-    const t = setTimeout(() => setStage('morph'), 750);
-    return () => clearTimeout(t);
-  }, [stage]);
-
-  /* ═══════════════════════════════════════════════
-     PHASE 4: Kinetic Morph JAYAKRISHNA → PORTFOLIO
+     PHASE 5: Kinetic Scramble Morph JAYAKRISHNA → PORTFOLIO
      ═══════════════════════════════════════════════ */
   useEffect(() => {
     if (stage !== 'morph') return;
@@ -177,7 +195,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
   }, [stage]);
 
   /* ═══════════════════════════════════════════════
-     PHASE 5: Portfolio Stage — Staggered UI Reveal
+     PHASE 6: Portfolio Stage — Heroic UI Emergence
      (Waits exclusively for user click on "Enter Studio")
      ═══════════════════════════════════════════════ */
   useEffect(() => {
@@ -250,9 +268,9 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
       const currentStage = stageRef.current;
 
       let speedMul = 1;
-      if (currentStage === 'exclamation') speedMul = 4;
-      else if (currentStage === 'flash') speedMul = 14;
-      else if (currentStage === 'name-glitch' || currentStage === 'name-hold') speedMul = 2;
+      if (currentStage === 'exclamation-drop') speedMul = 2.5;
+      else if (currentStage === 'exclamation-tilt') speedMul = 3.5;
+      else if (currentStage === 'name-settle') speedMul = 1.8;
       else if (currentStage === 'morph') speedMul = 3;
       else if (currentStage === 'portfolio') speedMul = 0.6;
       else if (currentStage === 'exit') speedMul = 6;
@@ -309,12 +327,6 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
     };
   }, []);
 
-  const isNameVisible =
-    stage === 'name-glitch' ||
-    stage === 'name-hold' ||
-    stage === 'morph' ||
-    stage === 'portfolio';
-
   return (
     <div
       ref={containerRef}
@@ -370,18 +382,6 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
         style={{
           background:
             'radial-gradient(ellipse at center, transparent 35%, rgba(8,10,14,0.7) 100%)',
-        }}
-      />
-
-      {/* ── White Flash Frame on Exclamation Impact ── */}
-      <div
-        className={`absolute inset-0 z-[50] pointer-events-none transition-opacity ${
-          stage === 'flash' ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          background:
-            'radial-gradient(circle at center, #ffffff 0%, rgba(0,217,255,0.4) 50%, transparent 80%)',
-          transitionDuration: stage === 'flash' ? '70ms' : '300ms',
         }}
       />
 
@@ -454,7 +454,7 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
 
       {/* ── Center Stage ── */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl">
-        {/* PHASE 1: Boot Terminal */}
+        {/* PHASE 1: Boot Terminal (1.3s) */}
         {stage === 'boot' && (
           <div className="relative flex flex-col items-start gap-1 font-mono-tech text-[11px] sm:text-xs text-[#38BDF8] max-w-md w-full px-4 sm:px-0">
             {BOOT_LINES.map((line, idx) => (
@@ -479,40 +479,79 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
           </div>
         )}
 
-        {/* PHASE 2: Exclamation Mark (!) Pop */}
-        {stage === 'exclamation' && (
-          <div className="relative flex items-center justify-center">
-            {/* Expanding shockwave rings */}
-            <div className="absolute w-28 h-28 rounded-full border border-[#00D9FF] animate-ping opacity-75" />
-            <div
-              className="absolute w-44 h-44 rounded-full border border-[#00D9FF]/40 animate-ping opacity-40"
-              style={{ animationDuration: '1.2s' }}
-            />
+        {/* ══════════════════════════════════════════════════════════
+             PHASE 2 & 3: EXCLAMATION DROP → TILT → NAME ROLLOUT
+             (Exact recreation of reference video physics!)
+             ══════════════════════════════════════════════════════════ */}
+        {(stage === 'exclamation-drop' || stage === 'exclamation-tilt') && (
+          <div className="relative flex items-center justify-center min-h-[140px]">
+            {/* The Dot: Anchored at baseline */}
+            <div className="relative flex items-center justify-center">
+              <div
+                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white transition-transform duration-300"
+                style={{
+                  boxShadow:
+                    '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.8), 0 0 60px rgba(0,217,255,0.4)',
+                }}
+              />
+              <div
+                className="absolute w-8 h-8 rounded-full border border-[#00D9FF]/60 animate-ping pointer-events-none"
+                style={{ animationDuration: '1.2s' }}
+              />
 
-            {/* Kinetic Pop Exclamation Mark */}
-            <div className="relative flex items-center justify-center animate-exclamation-pop">
-              <span
-                className="font-display font-black text-[clamp(5rem,16vw,10rem)] leading-none select-none tracking-wider"
+              {/* The Vertical Bar of "!": Drops onto dot, then tilts -65deg around the dot */}
+              <div
+                className={`absolute bottom-6 sm:bottom-7 left-1/2 -translate-x-1/2 w-3.5 sm:w-4 h-16 sm:h-20 rounded-t-sm transition-all duration-500 ease-out ${
+                  stage === 'exclamation-drop'
+                    ? 'animate-exclamation-drop'
+                    : ''
+                }`}
                 style={{
                   background:
-                    'linear-gradient(180deg, #FFFFFF 0%, #7DD3FC 45%, #00D9FF 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter:
-                    'drop-shadow(0 0 25px #00D9FF) drop-shadow(0 0 50px rgba(0,217,255,0.85)) drop-shadow(0 0 80px rgba(0,217,255,0.4))',
+                    'linear-gradient(180deg, #FFFFFF 0%, #E0F2FE 40%, #38BDF8 75%, #00D9FF 100%)',
+                  boxShadow: '0 0 25px rgba(0,217,255,0.8), 0 0 50px rgba(0,217,255,0.4)',
+                  transformOrigin: 'bottom center',
+                  transform:
+                    stage === 'exclamation-tilt'
+                      ? 'translate(-50%, 0) rotate(-65deg)'
+                      : 'translate(-50%, 0) rotate(0deg)',
                 }}
-              >
-                !
-              </span>
+              />
             </div>
+
+            {/* The Name Letters Unrolling / Springing Out from the Tilted Bar */}
+            {stage === 'exclamation-tilt' && (
+              <div className="absolute left-[54%] top-1/2 -translate-y-1/2 flex items-center font-display font-black text-[clamp(2.4rem,8vw,5.5rem)] leading-none uppercase tracking-[0.06em] whitespace-nowrap">
+                {NAME_LETTERS.map((letter, idx) => {
+                  const isVisible = idx < visibleLettersCount;
+                  return (
+                    <span
+                      key={idx}
+                      className="inline-block transition-all duration-300 ease-out"
+                      style={{
+                        opacity: isVisible ? 1 : 0,
+                        transform: isVisible
+                          ? 'translateX(0) scale(1) rotate(0deg)'
+                          : 'translateX(-30px) scale(0.6) rotate(-25deg)',
+                        color: '#FFFFFF',
+                        textShadow:
+                          '0 0 20px #00D9FF, 0 0 40px rgba(0,217,255,0.6)',
+                        filter: isVisible ? 'none' : 'blur(8px)',
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
-        {/* ═══════════════════════════════════════
-             PHASE 3–5: Name → Morph → Portfolio
-             Heroic Cinematic Alignment
-             ═══════════════════════════════════════ */}
-        {isNameVisible && (
+        {/* ══════════════════════════════════════════════════════════
+             PHASE 4–6: NAME SETTLE → MORPH → HEROIC PORTFOLIO
+             ══════════════════════════════════════════════════════════ */}
+        {(stage === 'name-settle' || stage === 'morph' || stage === 'portfolio') && (
           <div
             className={`relative flex flex-col items-center justify-center w-full z-10 transition-transform duration-700 ${
               stage === 'portfolio'
@@ -528,36 +567,35 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 letterSpacing: '0.06em',
               }}
             >
-              {/* Chromatic aberration layers during glitch */}
-              {stage === 'name-glitch' && (
+              {/* Subtle Chromatic Aberration during name-settle */}
+              {stage === 'name-settle' && (
                 <>
                   <span
-                    className="absolute inset-0 chrome-text"
+                    className="absolute inset-0 chrome-text pointer-events-none"
                     style={{
                       color: 'transparent',
                       clipPath: 'polygon(0 0, 100% 0, 100% 33%, 0 33%)',
-                      transform: 'translate(3px, -1px)',
-                      opacity: 0.7,
+                      transform: 'translate(2px, -1px)',
+                      opacity: 0.6,
                       filter: 'hue-rotate(-40deg)',
-                      animation: 'glitchTop 0.15s steps(2) infinite',
                     }}
                     aria-hidden="true"
                   >
                     {displayText}
                   </span>
                   <span
-                    className="absolute inset-0 chrome-text"
+                    className="absolute inset-0 chrome-text pointer-events-none"
                     style={{
                       color: 'transparent',
-                      clipPath:
-                        'polygon(0 67%, 100% 67%, 100% 100%, 0 100%)',
-                      transform: 'translate(-3px, 1px)',
-                      opacity: 0.7,
+                      clipPath: 'polygon(0 67%, 100% 67%, 100% 100%, 0 100%)',
+                      transform: 'translate(-2px, 1px)',
+                      opacity: 0.6,
                       filter: 'hue-rotate(40deg)',
-                      animation: 'glitchBottom 0.15s steps(2) infinite',
                     }}
                     aria-hidden="true"
-                  />
+                  >
+                    {displayText}
+                  </span>
                 </>
               )}
 
@@ -586,13 +624,11 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
                 </span>
               ) : (
                 <span
-                  className={`chrome-text tracking-[0.06em] ${
-                    stage === 'name-glitch' ? 'animate-screen-shake' : ''
-                  }`}
+                  className="chrome-text tracking-[0.06em]"
                   style={{
                     filter:
-                      stage === 'name-glitch'
-                        ? 'drop-shadow(0 0 60px rgba(0,217,255,0.6))'
+                      stage === 'name-settle'
+                        ? 'drop-shadow(0 0 50px rgba(0,217,255,0.5))'
                         : 'drop-shadow(0 0 40px rgba(0,217,255,0.4))',
                   }}
                 >
@@ -623,20 +659,55 @@ export function IntroSequence({ onComplete }: IntroSequenceProps) {
               />
             )}
 
-            {/* ── Enter Studio Trigger ── */}
+            {/* ══════════════════════════════════════════════════════════
+                 ULTRA-STYLISH, ATTRACTIVE "ENTER STUDIO" BUTTON
+                 ══════════════════════════════════════════════════════════ */}
             {showEnter && stage === 'portfolio' && (
-              <button
-                type="button"
-                onClick={handleSkip}
-                className="group relative inline-flex items-center gap-3 px-8 py-3.5 sm:px-10 sm:py-4 border border-[#00D9FF]/70 bg-[#00D9FF]/15 hover:bg-[#00D9FF] text-[#00D9FF] hover:text-[#080A0E] font-mono-tech text-xs sm:text-sm uppercase tracking-[0.22em] font-bold transition-all duration-300 shadow-[0_0_30px_rgba(0,217,255,0.35)] hover:shadow-[0_0_60px_rgba(0,217,255,0.7)] cursor-pointer animate-fade-in-up"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] group-hover:bg-[#080A0E] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D9FF] group-hover:bg-[#080A0E]" />
-                </span>
-                <span>Enter Studio</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
-              </button>
+              <div className="relative group animate-fade-in-up">
+                {/* Exterior Cyan Ambient Aura */}
+                <div
+                  aria-hidden="true"
+                  className="absolute -inset-1 rounded-full bg-gradient-to-r from-[#00D9FF] via-[#38BDF8] to-[#00D9FF] opacity-50 blur-lg transition-all duration-500 group-hover:opacity-90 group-hover:blur-xl pointer-events-none"
+                />
+
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  className="relative p-[1.5px] rounded-full overflow-hidden transition-transform duration-300 ease-out group-hover:scale-105 active:scale-95 cursor-pointer shadow-[0_0_35px_rgba(0,217,255,0.35)]"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(0,217,255,0.9) 50%, rgba(56,189,248,0.4) 100%)',
+                  }}
+                >
+                  {/* Glassmorphic Obsidian Button Core */}
+                  <div className="relative flex items-center gap-3.5 px-8 py-3.5 sm:px-10 sm:py-4 rounded-full bg-[#090C12]/92 backdrop-blur-xl transition-colors duration-300 group-hover:bg-[#00D9FF]/10 overflow-hidden">
+                    {/* Animated Shimmer Light Sweep */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-shimmer-sweep"
+                    />
+
+                    {/* Radar Pulse Beacon */}
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00D9FF] shadow-[0_0_8px_#00D9FF]" />
+                    </span>
+
+                    {/* Text Label */}
+                    <span className="font-display font-extrabold uppercase text-xs sm:text-sm tracking-[0.22em] text-white group-hover:text-[#00D9FF] transition-colors duration-300 whitespace-nowrap">
+                      Enter Studio
+                    </span>
+
+                    {/* Sparkle Icon */}
+                    <Sparkles className="w-3.5 h-3.5 text-[#38BDF8] opacity-70 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-300" />
+
+                    {/* Interactive Slide Arrow */}
+                    <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#00D9FF] group-hover:border-[#00D9FF] transition-all duration-300">
+                      <ArrowRight className="w-3.5 h-3.5 text-[#00D9FF] group-hover:text-[#080A0E] group-hover:translate-x-0.5 transition-all duration-300" />
+                    </div>
+                  </div>
+                </button>
+              </div>
             )}
           </div>
         )}
